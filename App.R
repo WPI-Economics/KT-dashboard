@@ -9,6 +9,12 @@ library(geojsonio)
 library(bslib)
 library(bsicons)
 
+#set the default value box behaviour globally
+# value_box_theme(
+#   min_height = "auto",   # let height shrink to content
+#   padding = "0.5rem"     # adjust internal padding
+# )
+
 # ui <- 
 ui <- 
   page_fillable(
@@ -22,21 +28,22 @@ ui <-
         "Summary",
         layout_sidebar(
           sidebar = sidebar(
-            value_box("Metric A", value = "321"),
-            value_box("Metric B", value = "654"),
-            value_box("Metric C", value = "987"),
-            value_box("Metric D", value = "202"),
-            value_box("Metric E", value = "303")
+            value_box("SMetric A", value = "321"),
+            value_box("SMetric B", value = "654"),
+            value_box("SMetric C", value = "987"),
+            value_box("SMetric D", value = "202"),
+            value_box("SMetric E", value = "303")
           ),
           layout_column_wrap(
             width = 1/1,
-            #card(
-            value_box(title = "People total",value = "120,000", showcase = bs_icon("bar-chart"),theme = "blue", max_height = "100px",fill = FALSE)
-            #)
-          ),
-          card(
+          
+            value_box(title = "Summary total",value = "120,000", showcase = bs_icon("bar-chart"),theme = "red", fill = TRUE),
+          
+          
+          card(fill = FALSE,
             card_header("CROSS SECTION CHART"),
             plotOutput("plot3")
+            )
           )
         )
       ),
@@ -59,13 +66,13 @@ ui <-
           # Main body
           layout_column_wrap(
             width = 1/1,
-            card(
-              value_box(title = "Total Social Return on Investment",value = "£3.8bn", showcase = bs_icon("bar-chart"),theme = "blue", max_height = "100px",fill = FALSE)
-            )
-          ),
-          card(
+            
+              value_box(title = "Total Social Return on Investment",value = "£3.8bn", showcase = bs_icon("bar-chart"),theme = "blue", fill = TRUE),
+            
+          card(fill = FALSE,
             card_header("Chart"),
             plotOutput("plot1")
+            )
           )
         )
       ),
@@ -83,13 +90,13 @@ ui <-
           ),
           layout_column_wrap(
             width = 1/1,
-            #card(
-            value_box(title = "People total",value = "120,000", showcase = bs_icon("bar-chart"),theme = "blue", max_height = "100px",fill = FALSE)
-            #)
-          ),
-          card(
+            
+            value_box(title = "People total",value = "120,000", showcase = bs_icon("bar-chart"),theme = "blue", fill = TRUE),
+                      
+          card(fill = FALSE,
             card_header("Chart"),
             plotOutput("plot2")
+            )
           )
         )
       ),
