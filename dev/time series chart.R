@@ -53,7 +53,7 @@ kt_sroi_colors_df <- tibble(
 
 #chart
 # this sets up a object for the data labels
-cht_data <- df_all$`GVA (-dw, attribution, and displacement) (£)`
+cht_data <- df_all$`Economic value (GVA)`
 
 # Create a list of points with dataLabels only on the last one, showing series.name
 cht_series <- lapply(seq_along(cht_data), function(i) {
@@ -77,7 +77,7 @@ cht_series <- lapply(seq_along(cht_data), function(i) {
 
 #chart
 # this sets up a object for the data labels for the second series
-cht_data_sub <- df$`GVA (-dw, attribution, and displacement) (£)`[df$group == "Male"] #substitute this for the selected interactive filter input
+cht_data_sub <- df %>% filter(group == "Male") %>% pull(`Economic value (GVA)`)#substitute this for the selected interactive filter input
 
 # Create a list of points with dataLabels only on the last one, showing series.name
 cht_series_sub <- lapply(seq_along(cht_data_sub), function(i) {
@@ -102,16 +102,17 @@ cht_series_sub <- lapply(seq_along(cht_data_sub), function(i) {
 plot <- highchart() %>% 
   hc_chart(type = "column", spacingRight = 80) %>%
   
-  hc_xAxis(categories = df$`Cohort years`,
+  hc_xAxis(categories = df_all$`Cohort years`, #substitute this for the selected interactive filter input
            title = list(text = "")
            
   ) %>% 
   
   #bar total
   hc_add_series(name="Total SROI",
-                data = (df$`Total savings (£)`),
+                data = (df_all$`Total savings`), #substitute this for the selected interactive filter input
                 stack = "Main",
                 pointPadding = 0,
+                
                 pointWidth = 25,
                 pointPlacement = 0.4,
                 groupPadding = 0,
@@ -120,14 +121,11 @@ plot <- highchart() %>%
   
   #bar sub-group
   hc_add_series(name="Total SROI - Male",
-                data = (df2$`Total savings (£)`[df2$Subgroup == "Male"]), #substitute this for the selected interactive filter input
+                data = df %>% filter(group == "Male") %>% pull(`Economic value (GVA)`), #substitute this for the selected interactive filter input
                 color = kt_colors[8], #purple
                 borderWidth = 0,
                 pointWidth = 23,
-                
-                pointPlacement = "on",
                 position = list(offsetY = -25),
-                
                 stack = "Main",
                 zIndex = 2,
                 x = -25) %>%
@@ -137,6 +135,7 @@ plot <- highchart() %>%
                 type = "line",
                 name = "Economic value",
                 marker = list(symbol = 'circle'),
+                pointPlacement = "on",
                 color = kt_colors[5],
                 zIndex = 50,
                 dataLabels = list(enabled = F)) %>%

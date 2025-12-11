@@ -1,0 +1,27 @@
+/* Create a new stacking context for the filter card */
+.filter-card {
+  position: relative !important;
+  overflow: visible !important;
+}
+
+/* Ensure all descendants inherit overflow behaviour */
+.filter-card * {
+  overflow: visible !important;
+}
+
+/* Ensure the dropdown floats above everything */
+.selectize-dropdown {
+  z-index: 99999 !important;
+  width: auto !important;
+  min-width: 100% !important;   /* at least as wide as the input */
+  max-width: none !important;   /* allow expansion for long items */
+}
+
+/* Ensure the dropdown content doesn’t get clipped */
+.selectize-dropdown-content {
+  white-space: nowrap !important;
+}
+
+h1 {
+  text-align: center !important;
+}
