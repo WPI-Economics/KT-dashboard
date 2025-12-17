@@ -14,7 +14,7 @@ library(sass)
 
 source("datasetup_charts.r")
 
-my_theme <- bs_theme(version = 5) |>
+my_theme <- bs_theme(version = 5) %>% 
   bs_add_rules(
     sass::sass(
       input = sass::sass_file("www/styles.scss")
@@ -30,8 +30,9 @@ my_theme <- bs_theme(version = 5) |>
 ui <- 
   
   page_fillable(
-    theme = my_theme,
     
+    theme = my_theme,
+    div(class = "container-md",
     tags$h1("ECONOMIC VALUE CALCULATOR 2025", id = "main-title"),
     #intro box
     # Intro row
@@ -108,8 +109,8 @@ ui <-
               actionButton(
                 inputId = "select_econ_value",
                 label = value_box(title = "Economic value", value = custom_number_format(df_ten_yr$`Economic value (GVA)`[df_ten_yr$group == "all"]), #pipe this in from the data
-                                                     showcase = bs_icon("bar-chart"), 
-                                  height = "10em",
+                                                    # showcase = bs_icon("bar-chart"), 
+                                  height = "6em",
                                                      theme = "purple"),
                 style = "border: none; background: none; padding: 0; width: 100%;"
               )
@@ -121,8 +122,8 @@ ui <-
               actionButton(
                 inputId = "select_off_value",
                 label = value_box(title = "Reduced re-offending", value = custom_number_format(df_ten_yr$`Reduced re-offending`[df_ten_yr$group == "all"]),#pipe this in from the data
-                      showcase = bs_icon("bar-chart"), 
-                      height = "10em",
+                      #showcase = bs_icon("bar-chart"), 
+                      height = "6em",
                       theme = "yellow"),
                 style = "border: none; background: none; padding: 0; width: 100%;"
               )
@@ -134,8 +135,8 @@ ui <-
               actionButton(
                 inputId = "select_dwp_value",
                 label = value_box(title = "DWP/Health admin", value = custom_number_format(df_ten_yr$`DWP/health admin`[df_ten_yr$group == "all"]),#pipe this in from the data
-                      showcase = bs_icon("bar-chart"), 
-                      height = "10em",
+                     # showcase = bs_icon("bar-chart"), 
+                      height = "6em",
                       theme = "red"),
                 style = "border: none; background: none; padding: 0; width: 100%;"
               )
@@ -147,8 +148,8 @@ ui <-
                   actionButton(
                     inputId = "select_vol_value",
                     label = value_box(title = "Volunteers", value = custom_number_format(df_ten_yr$`Volunteer value`[df_ten_yr$group == "all"]),#pipe this in from the data
-                                      showcase = bs_icon("bar-chart"), 
-                                      height = "10em",
+                                      #showcase = bs_icon("bar-chart"), 
+                                      height = "6em",
                                       theme = "orange"),
                     style = "border: none; background: none; padding: 0; width: 100%;"
                   )
@@ -160,8 +161,8 @@ ui <-
                       actionButton(
                         inputId = "select_well_value",
                         label = value_box(title = "Wellbeing", value = custom_number_format(df_ten_yr$Wellbeing[df_ten_yr$group == "all"]),#pipe this in from the data
-                      showcase = bs_icon("bar-chart"),
-                      height = "10em",theme = "grey"),
+                      #showcase = bs_icon("bar-chart"),
+                      height = "6em",theme = "grey"),
                 style = "border: none; background: none; padding: 0; width: 100%;"
               )
             )          ),
@@ -235,6 +236,7 @@ ui <-
         )
       )
     ))
+    )
 
 ########################################################################
 ########################################################################
@@ -562,8 +564,8 @@ server <- function(input, output, session) {
                       stack = "Main",
                       pointPadding = 0,
                       
-                      pointWidth = 25,
-                      pointPlacement = 0.4,
+                      pointWidth = 60,
+                      pointPlacement = 0,
                       groupPadding = 0,
                       color = kt_colors[6], #light grey
                       zIndex = 1) %>%
@@ -594,15 +596,16 @@ server <- function(input, output, session) {
       highchart2 <- highchart2 %>% 
         
         #bar sub-group
-        hc_add_series(name= unique(data_highchart_total_sub()$group),
+        hc_add_series(name= paste0("Total SROI: ", unique(data_highchart_total_sub()$group)),
                       data = data_highchart_total_sub()$`Total savings`, #make this interactive from the side boxes
                       color = kt_colors[8], #purple
                       borderWidth = 0,
-                      pointWidth = 23,
-                      position = list(offsetY = -25),
+                      pointWidth = 58,
+                      pointPlacement = -0.4,
+                      #position = list(offsetY = -25),
                       stack = "Main",
-                      zIndex = 2,
-                      x = -25) %>%
+                      zIndex = 2
+                      ) %>%
 
         
         #line component value sub-group
