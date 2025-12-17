@@ -1,7 +1,6 @@
 library(tidyverse)
 library(sf)
 library(shiny)
-# library(shinydashboard)
 library(waiter)
 library(htmltools)
 library(highcharter)
@@ -81,6 +80,8 @@ ui <-
                 )
               )
             ),
+            
+            
             value_box(title = "Summary total",
                       value = "120,000", #pipe this in from the data
                       showcase = bs_icon("bar-chart"),
@@ -101,21 +102,69 @@ ui <-
         "£ value",
         layout_sidebar(
           sidebar = sidebar(
-            value_box(title = "Economic value", value = custom_number_format(df_ten_yr$`Economic value (GVA)`[df_ten_yr$group == "all"]), #pipe this in from the data
-                      showcase = bs_icon("bar-chart"), height = "10em",
-                      theme = "purple"),
-            value_box(title = "Reduced re-offending", value = custom_number_format(df_ten_yr$`Reduced re-offending`[df_ten_yr$group == "all"]),#pipe this in from the data
-                      showcase = bs_icon("bar-chart"), height = "10em",
+            
+            tags$div(
+              class = "value-box-button",
+              actionButton(
+                inputId = "select_econ_value",
+                label = value_box(title = "Economic value", value = custom_number_format(df_ten_yr$`Economic value (GVA)`[df_ten_yr$group == "all"]), #pipe this in from the data
+                                                     showcase = bs_icon("bar-chart"), 
+                                  height = "10em",
+                                                     theme = "purple"),
+                style = "border: none; background: none; padding: 0; width: 100%;"
+              )
+            ),
+            
+            
+                        tags$div(
+              class = "value-box-button",
+              actionButton(
+                inputId = "select_off_value",
+                label = value_box(title = "Reduced re-offending", value = custom_number_format(df_ten_yr$`Reduced re-offending`[df_ten_yr$group == "all"]),#pipe this in from the data
+                      showcase = bs_icon("bar-chart"), 
+                      height = "10em",
                       theme = "yellow"),
-            value_box(title = "DWP/Health admin", value = custom_number_format(df_ten_yr$`DWP/health admin`[df_ten_yr$group == "all"]),#pipe this in from the data
-                      showcase = bs_icon("bar-chart"), height = "10em",
+                style = "border: none; background: none; padding: 0; width: 100%;"
+              )
+                        ),
+            
+            
+                        tags$div(
+              class = "value-box-button",
+              actionButton(
+                inputId = "select_dwp_value",
+                label = value_box(title = "DWP/Health admin", value = custom_number_format(df_ten_yr$`DWP/health admin`[df_ten_yr$group == "all"]),#pipe this in from the data
+                      showcase = bs_icon("bar-chart"), 
+                      height = "10em",
                       theme = "red"),
-            value_box(title = "Volunteers", value = custom_number_format(df_ten_yr$`Volunteer value`[df_ten_yr$group == "all"]),#pipe this in from the data
-                      showcase = bs_icon("bar-chart"), height = "10em",
-                      theme = "orange"),
-            value_box(title = "Wellbeing", value = custom_number_format(df_ten_yr$Wellbeing[df_ten_yr$group == "all"]),#pipe this in from the data
-                      showcase = bs_icon("bar-chart"),, height = "10em",theme = "grey")
-          ),
+                style = "border: none; background: none; padding: 0; width: 100%;"
+              )
+                        ),
+                
+                
+                tags$div(
+                  class = "value-box-button",
+                  actionButton(
+                    inputId = "select_vol_value",
+                    label = value_box(title = "Volunteers", value = custom_number_format(df_ten_yr$`Volunteer value`[df_ten_yr$group == "all"]),#pipe this in from the data
+                                      showcase = bs_icon("bar-chart"), 
+                                      height = "10em",
+                                      theme = "orange"),
+                    style = "border: none; background: none; padding: 0; width: 100%;"
+                  )
+                ),
+                    
+                    
+                    tags$div(
+                      class = "value-box-button",
+                      actionButton(
+                        inputId = "select_well_value",
+                        label = value_box(title = "Wellbeing", value = custom_number_format(df_ten_yr$Wellbeing[df_ten_yr$group == "all"]),#pipe this in from the data
+                      showcase = bs_icon("bar-chart"),
+                      height = "10em",theme = "grey"),
+                style = "border: none; background: none; padding: 0; width: 100%;"
+              )
+            )          ),
           # Main body
           layout_column_wrap(
             width = 1/1,
@@ -276,8 +325,57 @@ server <- function(input, output, session) {
     HTML("<span class='intro_copy'>Intro text copy to go here, box to be styled etc.")
   })
   
+  ###############
+  ############### clickable cards as selectors
+  ###############
   
-
+  #  1 Define the mapping (static, non-reactive)
+  metric_map <- c(
+    select_econ_value = colnames(df_ten_yr)[4], #the indexed colnames in case they change
+    select_off_value  = colnames(df_ten_yr)[5],
+    select_dwp_value  = colnames(df_ten_yr)[6],
+    select_well_value = colnames(df_ten_yr)[7],
+    select_vol_value  = colnames(df_ten_yr)[9]
+  )
+  
+  # 2 Define the reactive state
+  selected_metric <- reactiveVal("Economic value (GVA)")  # default
+ 
+  # 3 Observe all value-box buttons
+  # observeEvent(
+  #   {
+  #     input$select_econ_value
+  #     input$select_off_value
+  #     input$select_dwp_value
+  #     input$select_well_value
+  #     input$select_vol_value
+  #   },
+  #   {
+  #     clicked_id <- getDefaultReactiveDomain()$input$.lastInput
+  #     selected_metric(metric_map[[clicked_id]])
+  #   }
+  # )
+  
+  observeEvent(input$select_econ_value, {
+    selected_metric(metric_map[["select_econ_value"]])
+  })
+  
+  observeEvent(input$select_off_value, {
+    selected_metric(metric_map[["select_off_value"]])
+  })
+  
+  observeEvent(input$select_dwp_value, {
+    selected_metric(metric_map[["select_dwp_value"]])
+  })
+  
+  observeEvent(input$select_well_value, {
+    selected_metric(metric_map[["select_well_value"]])
+  })
+  
+  observeEvent(input$select_vol_value, {
+    selected_metric(metric_map[["select_vol_value"]])
+  })
+  
   
   ###############
   ############### reactive data for tab 1 chart
@@ -371,11 +469,26 @@ server <- function(input, output, session) {
   ############### reactive data for tab 2 chart
   ###############
   
-  data_highchart2 <- reactive({
+  data_highchart_aspect_sub <- reactive({
     #set up the df to feed the chart. This will change depending on user inputs
     df %>% 
-      filter(group == input$filter4) # <<<< INTERACTIVE INPUT HERE
-    
+      filter(group == input$filter4) %>%  # <<<< INTERACTIVE INPUT HERE
+    select(c(`Cohort years`, group, group_type, `Cohort count`, selected_column = all_of(selected_metric())))
+  })
+  
+  data_highchart_total_sub <- reactive({
+    #set up the df to feed the chart. This will change depending on user inputs
+    df %>% 
+      filter(group == input$filter4) %>%  # <<<< INTERACTIVE INPUT HERE
+      select(c(`Cohort years`, group, group_type, `Cohort count`, `Total savings`))
+  })
+  
+  
+  data_highchart_aspect_all <- reactive({
+    #set up the df to feed the chart. This will change depending on user inputs
+    df_all %>% 
+      select(c(`Cohort years`, group, group_type, `Cohort count`, 
+               selected_column = all_of(selected_metric())))
   })
   
   ###############
@@ -387,8 +500,9 @@ server <- function(input, output, session) {
     renderHighchart(expr = {
       
       # this sets up a object for the data labels
-      # NOT interactive, this is the constant background series
-      cht_data <- df_all$`Economic value (GVA)`
+      # Interactive with the aspect/element of SROI only - always shows the all/total no subgroups
+      #cht_data <- df_all$`Economic value (GVA)`
+      cht_data <- data_highchart_aspect_all() %>% pull(selected_column)
       
       # Create a list of points with dataLabels only on the last one, showing series.name
       cht_series <- lapply(seq_along(cht_data), function(i) {
@@ -412,7 +526,7 @@ server <- function(input, output, session) {
       
       
       # this sets up a object for the data labels for the second series - USER INTERACTIVE
-      cht_data_sub <- data_highchart2() %>% pull(`Economic value (GVA)`)
+      cht_data_sub <- data_highchart_aspect_sub() %>% pull(selected_column)
       
       # Create a list of points with dataLabels only on the last one, showing series.name
       cht_series_sub <- lapply(seq_along(cht_data_sub), function(i) {
@@ -454,37 +568,19 @@ server <- function(input, output, session) {
                       color = kt_colors[6], #light grey
                       zIndex = 1) %>%
         
-        #bar sub-group
-        hc_add_series(name= unique(data_highchart2()$group),
-                      data = data_highchart2()$`Total savings`, #make this interactive from the side boxes
-                      color = kt_colors[8], #purple
-                      borderWidth = 0,
-                      pointWidth = 23,
-                      position = list(offsetY = -25),
-                      stack = "Main",
-                      zIndex = 2,
-                      x = -25) %>%
-        
         #line component value
         hc_add_series(data = cht_series, #make this interactive from the side boxes
                       type = "line",
-                      name = "Economic value (GVA)", #make this interactive from the side boxes
+                      name = paste0(selected_metric(), ":<br>All "), #how to get this out of metric_map??
                       marker = list(symbol = 'circle'),
                       pointPlacement = "on",
                       color = kt_colors[5],
                       zIndex = 50,
                       dataLabels = list(enabled = F)) %>%
         
-        #line component value sub-group
-        hc_add_series(data = cht_series_sub, #make this interactive from the side boxes
-                      type = "line",
-                      name = unique(data_highchart2()$group), #make this interactive from the side boxes
-                      color = kt_colors[4],
 
-                      zIndex = 51,
-                      marker = list(symbol = 'circle'),
-                      dataLabels = list(enabled = F)) %>%
         
+
         hc_xAxis(title = list(text = ""))%>%
         hc_yAxis(title = list(text = "£")
         ) %>%
@@ -495,8 +591,33 @@ server <- function(input, output, session) {
                               fontFamily = "Arial", fontWeight = "400" )) %>% 
         hc_exporting(enabled = F) 
       
-      highchart2
+      #condition so that 
+      if (input$filter4 != "all") {
+      highchart2 <- highchart2 %>% 
+        
+        #bar sub-group
+        hc_add_series(name= unique(data_highchart_total_sub()$group),
+                      data = data_highchart_total_sub()$`Total savings`, #make this interactive from the side boxes
+                      color = kt_colors[8], #purple
+                      borderWidth = 0,
+                      pointWidth = 23,
+                      position = list(offsetY = -25),
+                      stack = "Main",
+                      zIndex = 2,
+                      x = -25) %>%
+
+        
+        #line component value sub-group
+        hc_add_series(data = cht_series_sub, #make this interactive from the side boxes
+                      type = "line",
+                      name = paste0(selected_metric(),":<br>", unique(data_highchart_aspect_sub()$group)), #make this interactive from the side boxes
+                      color = kt_colors[4],
+                      
+                      zIndex = 51,
+                      marker = list(symbol = 'circle'),
+                      dataLabels = list(enabled = F))}
       
+        highchart2
     } 
     )
   

@@ -25,3 +25,20 @@
 h1 {
   text-align: center !important;
 }
+
+/* style the interactive buttons */
+
+.value-box-button .btn {
+    width: 100%;
+    text-align: left;
+  }
+.value-box-button .value-box {
+    cursor: pointer;
+    transition: 0.2s;
+  }
+.value-box-button .value-box:hover {
+    transform: translateY(-3px);
+    box-shadow: 0 4px 12px rgba(0,0,0,0.15);
+  
+}
+
