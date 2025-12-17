@@ -82,8 +82,8 @@ ui <-
             ),
             
             
-            value_box(title = "Summary total",
-                      value = "120,000", #pipe this in from the data
+            value_box(title = "10 year total SROI",
+                      value = custom_number_format(df_ten_yr$`Total savings`[df_ten_yr$group == "all"]), #pipe this in from the data
                       showcase = bs_icon("bar-chart"),
                       theme = "red", 
                       fill = TRUE),
@@ -339,7 +339,7 @@ server <- function(input, output, session) {
   )
   
   # 2 Define the reactive state
-  selected_metric <- reactiveVal("Economic value (GVA)")  # default
+  selected_metric <- reactiveVal("Dummy")  # default
  
   # 3 Observe all value-box buttons
   # observeEvent(
@@ -568,18 +568,6 @@ server <- function(input, output, session) {
                       color = kt_colors[6], #light grey
                       zIndex = 1) %>%
         
-        #line component value
-        hc_add_series(data = cht_series, #make this interactive from the side boxes
-                      type = "line",
-                      name = paste0(selected_metric(), ":<br>All "), #how to get this out of metric_map??
-                      marker = list(symbol = 'circle'),
-                      pointPlacement = "on",
-                      color = kt_colors[5],
-                      zIndex = 50,
-                      dataLabels = list(enabled = F)) %>%
-        
-
-        
 
         hc_xAxis(title = list(text = ""))%>%
         hc_yAxis(title = list(text = "£")
@@ -589,9 +577,19 @@ server <- function(input, output, session) {
                  
                  style = list(fontSize ="24px",#color = green.pair[1], 
                               fontFamily = "Arial", fontWeight = "400" )) %>% 
-        hc_exporting(enabled = F) 
+        hc_exporting(enabled = F) %>% 
+          
+        #line component value
+          hc_add_series(data = cht_series, #make this interactive from the side boxes
+                        type = "line",
+                        name = ifelse(selected_metric() == "Dummy","",  paste0(selected_metric(), ":<br>All ")), #how to get this out of metric_map??
+                        marker = list(symbol = 'circle'),
+                        pointPlacement = "on",
+                        color = kt_colors[5],
+                        zIndex = 50,
+                        dataLabels = list(enabled = F))
       
-      #condition so that 
+      #condition so that sub groups don't render until a sub group selected
       if (input$filter4 != "all") {
       highchart2 <- highchart2 %>% 
         
@@ -617,7 +615,9 @@ server <- function(input, output, session) {
                       marker = list(symbol = 'circle'),
                       dataLabels = list(enabled = F))}
       
-        highchart2
+
+      
+      highchart2
     } 
     )
   

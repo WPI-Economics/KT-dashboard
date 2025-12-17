@@ -51,7 +51,8 @@ df <- read_csv("db_data.csv") %>%
          "Total savings" = `Total savings (£)`
          ) %>% 
   mutate(
-    "Volunteer value" = `Volunteers (-attribution) (£)` + `Volunteer value (mentor and non-mentor) (£)`
+    "Volunteer value" = `Volunteers (-attribution) (£)` + `Volunteer value (mentor and non-mentor) (£)`,
+    "Dummy" = NA
   ) %>% 
   select(-c(`Volunteers (-attribution) (£)`, `Volunteer value (mentor and non-mentor) (£)`)) %>% 
   relocate(`group_type`, .after = `group`) %>% 
@@ -65,10 +66,10 @@ df <- read_csv("db_data.csv") %>%
                                "2021/22", 
                                "2022/23", 
                                "2023/24", 
-                               "2024/25")) %>% na.omit()
+                               "2024/25")) %>% filter(!is.na(group))
 
 #subset the total/all group for a constant series in the chart
-df_all <- df %>% filter(group == "all") %>% na.omit()
+df_all <- df %>% filter(group == "all") #%>% na.omit()
 
 df_ten_yr <- df %>% group_by(group, group_type) %>%
   summarise_if(is.numeric, sum)
