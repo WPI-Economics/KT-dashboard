@@ -359,7 +359,7 @@ server <- function(input, output, session) {
     HTML("<span class='intro_copy'> This dashboard presents the headline results of the King's Trust Social Returns on Investment (SROI) economic analysis done in collaboration with WPI Economics. <br><br>
          The summary tab below gives results aggregated over the ten year period from 2015/16 to 2024/25 split by 5 components. Use the filters to select a sub group of interest.<br><br>
          The `Time Series` tab gives results over time. Use the blue buttons on the left to add one of the five components to the chart and also use the filters to select sub-groups of interest.<br><br>
-         Worth noting that the series can be swithced off from the legend of each chart if a metric is overpowering a chart!
+         Worth noting that the series can be switched off from the legend of each chart if a metric is overpowering a chart!
          
          
          ")
