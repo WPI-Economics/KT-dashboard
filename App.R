@@ -187,7 +187,7 @@ ui <-
               class = "value-box-button",
               onclick = "Shiny.setInputValue('select_well_value', Math.random())",
               value_box(
-                title = "Volunteer value (10 yr)",
+                title = "Wellbeing value (10 yr)",
                 value = custom_number_format(df_ten_yr$Wellbeing[df_ten_yr$group == "all"]),
                 height = "6em",
                 theme = value_box_theme(bg = kt_colors[2]) #"white"
