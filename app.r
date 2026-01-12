@@ -38,9 +38,9 @@ ui <-
         
       div(class = "container-md",
         id = "main-header",
-      img(src = "logo_left.svg", id = "main-logo", class = "header-logo"),
+      img(src = "logo_leftx.svg", id = "main-logo", class = "header-logo"),
       tags$h1("ECONOMIC VALUE CALCULATOR 2025", id = "main-title"),
-      img(src = "logo_right.svg", id = "main-logo", class = "header-logo")
+      img(src = "logo_rightx.svg", id = "main-logo", class = "header-logo")
       ),
     
     tags$script(HTML(" Shiny.addCustomMessageHandler('addSelectedClass', function(id) {
@@ -353,7 +353,7 @@ server <- function(input, output, session) {
   
   #the copy for the umm intro box!
   output$intro_box_copy <- renderUI({
-    HTML("<span class='intro_copy'> This dashboard presents the headline results of the King's Trust Social Returns on Investment (SROI) economic analysis done in collaboration with WPI Economics. <br><br>
+    HTML("<span class='intro_copy'> This dashboard presents the headline results of the xxx xxx Social Returns on Investment (SROI) economic analysis done in collaboration with xxx Economics. <br><br>
          The summary tab below gives results aggregated over the ten year period from 2015/16 to 2024/25 split by 5 components. Use the filters to select a sub group of interest.<br><br>
          The `Time Series` tab gives results over time. Use the blue buttons on the left to add one of the five components to the chart and also use the filters to select sub-groups of interest.<br><br>
          Worth noting that the series can be switched off from the legend of each chart if a metric is overpowering a chart!

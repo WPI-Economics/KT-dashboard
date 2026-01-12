@@ -43,7 +43,7 @@ kt_colors <- c("#CC0033", #1 red
 #####################
 
 #read in the data and clean up a bit
-df <- read_csv("db_data.csv") %>% 
+df <- read_csv("db_data_DUMMY.csv") %>% 
   select(-`Salaries (-dw, attribution, and displacement) (£)`) %>% 
   rename("Economic value (GVA)" = `GVA (-dw, attribution, and displacement) (£)`,
          "Reduced re-offending" = `Savings from reduced reoffending (£)`,
