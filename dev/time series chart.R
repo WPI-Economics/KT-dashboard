@@ -8,33 +8,52 @@ kt_colors <- c("#CC0033", #red
                "#28D796", #limegreen
                "#5009B0", #purple
                "#323232", #charcoal
-               "#F2F2F2",
-               "#7a6da0",
-               "#a69bbf") 
+               "#F2F2F2", #grey
+               "#7a6da0", #mid-purple
+               "#a69bbf", #light purple
+               "#95e8bf", #mid green
+               "#def6e9" #light green
+               ) 
 
+#read in the data and clean up a bit
+df <- read_csv("db_data.csv") %>% 
+  select(-`Salaries (-dw, attribution, and displacement) (£)`) %>% 
+  rename("Economic value (GVA)" = `GVA (-dw, attribution, and displacement) (£)`,
+         "Reduced re-offending" = `Savings from reduced reoffending (£)`,
+         "DWP/health admin" = `Savings to DWP/Health (£)`,
+         "Wellbeing" = `WELLBY (-dw and attribution) (£)`,
+         "Total savings" = `Total savings (£)`
+         ) %>% 
+  mutate(
+    "Volunteer value" = `Volunteers (-attribution) (£)` + `Volunteer value (mentor and non-mentor) (£)`
+  ) %>% 
+  select(-c(`Volunteers (-attribution) (£)`, `Volunteer value (mentor and non-mentor) (£)`)) %>% 
+  filter(`Cohort years` %in% c("2014/15", 
+                               "2015/16", 
+                               "2016/17", 
+                               "2017/18", 
+                               "2018/19", 
+                               "2019/20", 
+                               "2020/21", 
+                               "2021/22", 
+                               "2022/23", 
+                               "2023/24", 
+                               "2024/25"))
 
-#read in test data (total)
-df <- read_excel("dev/Total savings year.xlsx") 
-df[2:9] <- lapply(df[2:9], function(x){str_replace_all(x, "£", "")})
-df[2:9] <- lapply(df[2:9], function(x){str_replace_all(x, ",", "")})
-df[2:9] <- lapply(df[2:9], as.numeric) 
-df <- df %>% na.omit() %>% 
-mutate("Subgroup" = "Total")
+#subset the total/all group for a constant series in the chart
+df_all <- df %>% filter(group == "all") %>% na.omit()
 
-#read in test data (by sex)
-df2 <- read_excel("dev/Savings by year and sex.xlsx") 
-df2[3:11] <- lapply(df2[3:11], function(x){str_replace_all(x, "£", "")})
-df2[3:11] <- lapply(df2[3:11], function(x){str_replace_all(x, ",", "")})
-df2[3:11] <- lapply(df2[3:11], as.numeric) 
-df2 <- df2 %>% na.omit() %>% 
-  rename("Subgroup" = "gender")
-
+#set up a color lookup for the chart
+kt_sroi_colors_df <- tibble(
+  subgroup = colnames(df)[4:ncol(df)],
+  subgroup.colour = kt_colors[1:(ncol(df)-3)]
+)
 
   
 
 #chart
 # this sets up a object for the data labels
-cht_data <- df$`GVA (-dw, attribution, and displacement) (£)`
+cht_data <- df_all$`Economic value (GVA)`
 
 # Create a list of points with dataLabels only on the last one, showing series.name
 cht_series <- lapply(seq_along(cht_data), function(i) {
@@ -58,7 +77,7 @@ cht_series <- lapply(seq_along(cht_data), function(i) {
 
 #chart
 # this sets up a object for the data labels for the second series
-cht_data_sub <- df2$`GVA (-dw, attribution, and displacement) (£)`[df2$Subgroup == "Male"]
+cht_data_sub <- df %>% filter(group == "Male") %>% pull(`Economic value (GVA)`)#substitute this for the selected interactive filter input
 
 # Create a list of points with dataLabels only on the last one, showing series.name
 cht_series_sub <- lapply(seq_along(cht_data_sub), function(i) {
@@ -83,16 +102,17 @@ cht_series_sub <- lapply(seq_along(cht_data_sub), function(i) {
 plot <- highchart() %>% 
   hc_chart(type = "column", spacingRight = 80) %>%
   
-  hc_xAxis(categories = df$`Cohort years`,
+  hc_xAxis(categories = df_all$`Cohort years`, #substitute this for the selected interactive filter input
            title = list(text = "")
            
   ) %>% 
   
   #bar total
   hc_add_series(name="Total SROI",
-                data = (df$`Total savings (£)`),
+                data = (df_all$`Total savings`), #substitute this for the selected interactive filter input
                 stack = "Main",
                 pointPadding = 0,
+                
                 pointWidth = 25,
                 pointPlacement = 0.4,
                 groupPadding = 0,
@@ -101,14 +121,11 @@ plot <- highchart() %>%
   
   #bar sub-group
   hc_add_series(name="Total SROI - Male",
-                data = (df2$`Total savings (£)`[df2$Subgroup == "Male"]),
+                data = df %>% filter(group == "Male") %>% pull(`Economic value (GVA)`), #substitute this for the selected interactive filter input
                 color = kt_colors[8], #purple
                 borderWidth = 0,
                 pointWidth = 23,
-                
-                pointPlacement = "on",
                 position = list(offsetY = -25),
-                
                 stack = "Main",
                 zIndex = 2,
                 x = -25) %>%
@@ -118,6 +135,7 @@ plot <- highchart() %>%
                 type = "line",
                 name = "Economic value",
                 marker = list(symbol = 'circle'),
+                pointPlacement = "on",
                 color = kt_colors[5],
                 zIndex = 50,
                 dataLabels = list(enabled = F)) %>%
