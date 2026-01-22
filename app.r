@@ -1,4 +1,4 @@
-library(tidyverse)
+library(dplyr)
 library(shiny)
 library(htmltools)
 library(highcharter)
@@ -43,10 +43,23 @@ ui <-
       img(src = "logo_right.svg", id = "main-logo", class = "header-logo")
       ),
     
-    tags$script(HTML(" Shiny.addCustomMessageHandler('addSelectedClass', function(id) {
-                     $('#' + id).addClass('selected'); });
-                     Shiny.addCustomMessageHandler('removeSelectedClass', function(id) { $('#' + id).removeClass('selected'); });
-                     ")),
+      tags$script(HTML("
+  Shiny.addCustomMessageHandler('addSelectedClass', function(id) {
+    $('#' + id).addClass('selected');
+  });
+
+  Shiny.addCustomMessageHandler('removeSelectedClass', function(id) {
+    $('#' + id).removeClass('selected');
+  });
+
+  Shiny.addCustomMessageHandler('resetSelectize', function(id) {
+    var el = $('#' + id)[0];
+    if (el && el.selectize) {
+      el.selectize.clearOptions();
+    }
+  });
+"))
+      ,
     #intro box
     # Intro row
     fluidRow(
@@ -91,8 +104,14 @@ ui <-
                 
                 layout_column_wrap(
                   width = 1/2,
-                  selectizeInput("filter1", "Parent", choices = unique(df$group_type), options = list( persist = FALSE, create = FALSE )),
-                  selectizeInput("filter2", "Subgroup", choices = NULL, options = list( persist = FALSE, create = FALSE )) #this needs to reference the selector above!
+                  selectizeInput("filter1", "Parent", choices = unique(df$group_type), 
+                                 options = list( 
+                                   persist = FALSE, 
+                                   create = FALSE )),
+                  selectizeInput("filter2", "Subgroup", choices = NULL, 
+                                 options = list( 
+                                   persist = FALSE, 
+                                   create = FALSE )) #this needs to reference the selector above!
                 )
               )
             ),
@@ -204,8 +223,13 @@ ui <-
                 style = "height: 90px;",
                 layout_column_wrap(
                   width = 1/2,
-                  selectizeInput("filter3", "Subgroup parent", choices = unique(df$group_type), options = list( persist = FALSE, create = FALSE )),
-                  selectizeInput("filter4", "Subgroup", choices = NULL, options = list( persist = FALSE, create = FALSE )) 
+                  selectizeInput("filter3", "Subgroup parent", choices = unique(df$group_type), 
+                                 options = list( 
+                                   persist = FALSE, 
+                                   create = FALSE )),
+                  selectizeInput("filter4", "Subgroup", choices = NULL, 
+                                 options = list( 
+                                   persist = FALSE, create = FALSE )) 
                 )
               )
             ),
@@ -291,13 +315,16 @@ server <- function(input, output, session) {
     state$parent <- input$filter1
     
     if (is.null(input$filter1) || input$filter1 == "") {
-      updateSelectizeInput(session, "filter2", choices = NULL)
+      # Clear everything when parent is empty 
+      session$sendCustomMessage("resetSelectize", "filter2")
+      updateSelectizeInput(session, "filter2", choices = NULL, server = TRUE)
       state$subgroup <- NULL
       return()
     }
     
     subset_choices <- unique(df$group[df$group_type == input$filter1])
-    
+    # Clear everything when parent is empty 
+    session$sendCustomMessage("resetSelectize", "filter2")
     updateSelectizeInput(
       session, "filter2",
       choices  = subset_choices,
@@ -329,13 +356,17 @@ server <- function(input, output, session) {
     state2$parent <- input$filter3
     
     if (is.null(input$filter3) || input$filter3 == "") {
-      updateSelectizeInput(session, "filter4", choices = NULL)
+      # Clear everything when parent is empty 
+      session$sendCustomMessage("resetSelectize", "filter4")
+      updateSelectizeInput(session, "filter4", choices = NULL, server = TRUE)
       state2$subgroup <- NULL
       return()
     }
     
     subset_choices2 <- unique(df$group[df$group_type == input$filter3])
     
+    # Clear everything when parent is empty 
+    session$sendCustomMessage("resetSelectize", "filter4")
     updateSelectizeInput(
       session, "filter4",
       choices  = subset_choices2,

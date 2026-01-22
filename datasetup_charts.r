@@ -53,7 +53,11 @@ df <- read_csv("db_data.csv") %>%
          ) %>% 
   mutate(
     "Volunteer value" = `Volunteers (-attribution) (£)` + `Volunteer value (mentor and non-mentor) (£)`,
-    "Dummy" = NA
+    "Dummy" = NA,
+    "group" = case_when(
+      group == "all"~ "-",
+      .default = group
+    )
   ) %>% 
   select(-c(`Volunteers (-attribution) (£)`, `Volunteer value (mentor and non-mentor) (£)`)) %>% 
   relocate(`group_type`, .after = `group`) %>% 
