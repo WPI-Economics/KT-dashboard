@@ -640,7 +640,11 @@ server <- function(input, output, session) {
         ) %>%
         
         hc_yAxis(title = list(text = "£")) %>%
-        hc_exporting(enabled = FALSE)
+        hc_exporting(enabled = FALSE) %>% 
+        hc_tooltip(
+          useHTML = TRUE, 
+          formatter = JS(" function() { return '£' + Highcharts.numberFormat(this.y / 1e6, 1) + 'M</b>'; } ") 
+        )
       
       highchart1
       
@@ -744,7 +748,11 @@ server <- function(input, output, session) {
         hc_plotOptions(
           column = list(
             animation = FALSE,
-            grouping = FALSE) ) #%>%  # don’t put series side by side
+            grouping = FALSE) ) %>% 
+        hc_tooltip(
+          useHTML = TRUE, 
+          formatter = JS(" function() { return '£' + Highcharts.numberFormat(this.y / 1e6, 1) + 'M</b>'; } ") 
+        )
           
         
                  
