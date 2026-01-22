@@ -152,70 +152,7 @@ ui <-
             uiOutput("t2_sidebox5")
             ),
             
-            # tags$div(
-            #   id = "select_econ_value_box",
-            #   class = "value-box-button",
-            #   onclick = "Shiny.setInputValue('select_econ_value', Math.random())",
-            #   value_box(
-            #     title = "Economic value (10 yr)",
-            #     value = custom_number_format(df_ten_yr$`Economic value (GVA)`[df_ten_yr$group == "-"]),
-            #     height = "6em",
-            #     theme = value_box_theme(bg = kt_colors[2])  #"purple"
-            #   )
-            # ),
-            # 
-            # 
-            # tags$div(
-            #   id = "select_off_value_box",
-            #   class = "value-box-button",
-            #   onclick = "Shiny.setInputValue('select_off_value', Math.random())",
-            #   value_box(
-            #     title = "Re-offender value (10 yr)",
-            #     value = custom_number_format(df_ten_yr$`Reduced re-offending`[df_ten_yr$group == "-"]),
-            #     height = "6em",
-            #     theme = value_box_theme(bg = kt_colors[2])  #"yellow"
-            #   )
-            # ),
-            # 
-            # tags$div(
-            #   id = "select_dwp_value_box",
-            #   class = "value-box-button",
-            #   onclick = "Shiny.setInputValue('select_dwp_value', Math.random())",
-            #   value_box(
-            #     title = "DWP/health value (10 yr)",
-            #     value = custom_number_format(df_ten_yr$`DWP/health admin`[df_ten_yr$group == "-"]),
-            #     height = "6em",
-            #     theme = value_box_theme(bg = kt_colors[2]) #"red"
-            #   )
-            # ) ,
-            #     
-            #     
-            # tags$div(
-            #   id = "select_vol_value_box",
-            #   class = "value-box-button",
-            #   onclick = "Shiny.setInputValue('select_vol_value', Math.random())",
-            #   value_box(
-            #     title = "Volunteer value (10 yr)",
-            #     value = custom_number_format(df_ten_yr$`Volunteer value`[df_ten_yr$group == "-"]),
-            #     height = "6em",
-            #     theme = value_box_theme(bg = kt_colors[2]) #"orange"
-            #   )
-            # ) ,
-            # 
-            # 
-            # 
-            # tags$div(
-            #   id = "select_well_value_box",
-            #   class = "value-box-button",
-            #   onclick = "Shiny.setInputValue('select_well_value', Math.random())",
-            #   value_box(
-            #     title = "Wellbeing value (10 yr)",
-            #     value = custom_number_format(df_ten_yr$Wellbeing[df_ten_yr$group == "-"]),
-            #     height = "6em",
-            #     theme = value_box_theme(bg = kt_colors[2]) #"white"
-            #   )
-            # ) 
-            # ),
+            
             
           # Main body
           layout_column_wrap(
@@ -410,34 +347,47 @@ server <- function(input, output, session) {
   ############### clickable cards as selectors
   ###############
   
-  #the output containers
+
+
   output$t2_sidebox1 <- renderUI({
-    #the data logic
-    selected <- state2$subgroup 
-    filtered <- df_ten_yr[df_ten_yr$group %in% selected, ] 
-    total <- sum(filtered$"Economic value (GVA)", na.rm = TRUE)
-    #the box
-    tags$div(
-    id = "select_econ_value_box",
-    class = "value-box-button",
-    onclick = "Shiny.setInputValue('select_econ_value', Math.random())",
-    value_box(
-      title = "Economic value (10 yr)",
-      value = custom_number_format(total),
-      height = "6em",
-      theme = value_box_theme(bg = kt_colors[2])  #"purple"
+    # data logic
+    selected <- state2$subgroup
+    filtered <- df_ten_yr[df_ten_yr$group %in% selected, ]
+    total <- sum(filtered$`Economic value (GVA)`, na.rm = TRUE)
+
+    # build the UI
+    ui <- tags$div(
+      id = "select_econ_value_box",
+      class = "value-box-button",
+      onclick = "Shiny.setInputValue('select_econ_value', Math.random())",
+      value_box(
+        title = "Economic value (10 yr)",
+        value = custom_number_format(total),
+        height = "6em",
+        theme = value_box_theme(bg = kt_colors[2])
+      )
     )
-  )
+
+    # re-apply the selected class AFTER the DOM is updated
+    session$onFlushed(function() {
+      val = isolate(selected_metric_id())
+      if (!is.null(val) && val == "select_econ_value") {
+        session$sendCustomMessage("addSelectedClass", "select_econ_value_box")
+      }
+    }, once = FALSE)
+
+    ui
   })
-  
-  
+
+
+
   output$t2_sidebox2 <- renderUI({
     #the data logic
-    selected <- state2$subgroup 
-    filtered <- df_ten_yr[df_ten_yr$group %in% selected, ] 
+    selected <- state2$subgroup
+    filtered <- df_ten_yr[df_ten_yr$group %in% selected, ]
     total <- sum(filtered$"Reduced re-offending", na.rm = TRUE)
     #the box
-    tags$div(
+    ui <- tags$div(
       id = "select_off_value_box",
       class = "value-box-button",
       onclick = "Shiny.setInputValue('select_off_value', Math.random())",
@@ -448,15 +398,25 @@ server <- function(input, output, session) {
         theme = value_box_theme(bg = kt_colors[2])  #"yellow"
       )
     )
+    
+    # re-apply the selected class AFTER the DOM is updated
+    session$onFlushed(function() {
+      val = isolate(selected_metric_id())
+      if (!is.null(val) && val == "select_off_value") {
+        session$sendCustomMessage("addSelectedClass", "select_off_value_box")
+      }
+    }, once = FALSE)
+    
+    ui
   })
-  
+
   output$t2_sidebox3 <- renderUI({
     #the data logic
-    selected <- state2$subgroup 
-    filtered <- df_ten_yr[df_ten_yr$group %in% selected, ] 
+    selected <- state2$subgroup
+    filtered <- df_ten_yr[df_ten_yr$group %in% selected, ]
     total <- sum(filtered$"DWP/health admin", na.rm = TRUE)
     #the box
-    tags$div(
+   ui <- tags$div(
       id = "select_dwp_value_box",
       class = "value-box-button",
       onclick = "Shiny.setInputValue('select_dwp_value', Math.random())",
@@ -467,16 +427,26 @@ server <- function(input, output, session) {
         theme = value_box_theme(bg = kt_colors[2]) #"red"
       )
     )
+   # re-apply the selected class AFTER the DOM is updated
+   session$onFlushed(function() {
+     val = isolate(selected_metric_id())
+     if (!is.null(val) && val == "select_dwp_value") {
+       session$sendCustomMessage("addSelectedClass", "select_dwp_value_box")
+     }
+   }, once = FALSE)
+   
+   ui
+   
   })
-  
-  
+
+
   output$t2_sidebox4 <- renderUI({
     #the data logic
-    selected <- state2$subgroup 
-    filtered <- df_ten_yr[df_ten_yr$group %in% selected, ] 
+    selected <- state2$subgroup
+    filtered <- df_ten_yr[df_ten_yr$group %in% selected, ]
     total <- sum(filtered$"Wellbeing", na.rm = TRUE)
     #the box
-    tags$div(
+   ui <- tags$div(
       id = "select_well_value_box",
       class = "value-box-button",
       onclick = "Shiny.setInputValue('select_well_value', Math.random())",
@@ -487,15 +457,24 @@ server <- function(input, output, session) {
         theme = value_box_theme(bg = kt_colors[2]) #"white"
       )
     )
+   # re-apply the selected class AFTER the DOM is updated
+   session$onFlushed(function() {
+     val = isolate(selected_metric_id())
+     if (!is.null(val) && val == "select_well_value") {
+       session$sendCustomMessage("addSelectedClass", "select_well_value_box")
+     }
+   }, once = FALSE)
+   
+   ui
   })
-  
+
   output$t2_sidebox5 <- renderUI({
     #the data logic
-    selected <- state2$subgroup 
-    filtered <- df_ten_yr[df_ten_yr$group %in% selected, ] 
+    selected <- state2$subgroup
+    filtered <- df_ten_yr[df_ten_yr$group %in% selected, ]
     total <- sum(filtered$"Volunteer value", na.rm = TRUE)
     #the box
-    tags$div(
+  ui <- tags$div(
       id = "select_vol_value_box",
       class = "value-box-button",
       onclick = "Shiny.setInputValue('select_vol_value', Math.random())",
@@ -506,8 +485,15 @@ server <- function(input, output, session) {
         theme = value_box_theme(bg = kt_colors[2]) #"orange"
       )
     )
-      
-    
+  # re-apply the selected class AFTER the DOM is updated
+  session$onFlushed(function() {
+    val = isolate(selected_metric_id())
+    if (!is.null(val) && val == "select_vol_value") {
+      session$sendCustomMessage("addSelectedClass", "select_vol_value_box")
+    }
+  }, once = FALSE)
+
+  ui
   })
  
   
@@ -578,13 +564,13 @@ server <- function(input, output, session) {
   
   data_highchart1 <- reactive({
     #set up the df to feed the chart. This will change depending on user inputs
-    df %>% filter(`Cohort years` == "2024/25") %>% 
-      select(-c(`Cohort count`,`Total savings`, `Dummy`)) %>% 
+    df_ten_yr %>% #filter(`Cohort years` == "2024/25") %>% 
+      select(-c(`Cohort count`,`Total savings`)) %>% 
       filter(group == input$filter2, # <<<< INTERACTIVE INPUT HERE
              
       ) %>% 
       pivot_longer(
-        cols = 4:ncol(.),
+        cols = 3:ncol(.),
         values_to = "values",
         names_to = "names"
       ) %>% 
