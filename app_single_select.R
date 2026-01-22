@@ -18,8 +18,8 @@ my_theme <- bs_theme(version = 5,
                      base_font = "Helvetica") %>% 
   bs_add_rules(
     sass::sass_file("www/styles.scss")
-    )
-  
+  )
+
 
 ########################################################################
 ########################################################################
@@ -32,22 +32,18 @@ ui <-
   page_fillable(
     
     theme = my_theme,
-   
     
-  div(class = "container-md",
+    
+    div(class = "container-md",
         
-      div(class = "container-md",
-        id = "main-header",
-      img(src = "logo_left.svg", id = "main-logo", class = "header-logo"),
-      tags$h1("ECONOMIC VALUE CALCULATOR 2025", id = "main-title"),
-      img(src = "logo_right.svg", id = "main-logo", class = "header-logo")
-      ),
-   
-#the functions below do 2 things 
-# 1. toggles the CSS class pre and post selection so that can be formatted differently
-# 2. overrides the selectize default behavious of populating a dropdown filter with the previous selection as the first in a new list
-       
-      tags$script(HTML("
+        div(class = "container-md",
+            id = "main-header",
+            img(src = "logo_left.svg", id = "main-logo", class = "header-logo"),
+            tags$h1("ECONOMIC VALUE CALCULATOR 2025", id = "main-title"),
+            img(src = "logo_right.svg", id = "main-logo", class = "header-logo")
+        ),
+        
+        tags$script(HTML("
   Shiny.addCustomMessageHandler('addSelectedClass', function(id) {
     $('#' + id).addClass('selected');
   });
@@ -63,237 +59,237 @@ ui <-
     }
   });
 "))
-      ,
-    #intro box
-    # Intro row
-    fluidRow(
-      column(
-        width = 12,
-        bslib::card(
-          id = "intro_box",
-          uiOutput("intro_box_copy")
-        )
-      )
-    ),
-
-    page_navbar(
-      title = "",   # HEADER
-      id = "summary-navbar",
-      
-      # ---- TAB summary ----
-      nav_panel(
-       
-        "Summary",
+        ,
+        #intro box
+        # Intro row
+        fluidRow(
+          column(
+            width = 12,
+            bslib::card(
+              id = "intro_box",
+              uiOutput("intro_box_copy")
+            )
+          )
+        ),
         
-        #removed as we don't need a sidebar for the summary
-                # layout_sidebar(
-        #   sidebar = sidebar(
-        #     value_box("SMetric A", value = "321", height = "10em",),
-        #     value_box("SMetric B", value = "654", height = "10em",),
-        #     value_box("SMetric C", value = "987", height = "10em",),
-        #     value_box("SMetric D", value = "202", height = "10em",),
-        #     value_box("SMetric E", value = "303", height = "10em",)
-        #   ),
-        
-          layout_column_wrap(
-            width = 1/1,
-            max_height = 350,
-            min_height = 350,
-            # --- FILTER ROW ---
-            card(
-              class = "filter-card",
-              #style = "padding: 0;",
-              
-              card_body(
-                
-                layout_column_wrap(
-                  width = 1/2,
-                  selectizeInput("filter1", "Parent", choices = unique(df$group_type), 
-                                 options = list( 
-                                   persist = FALSE, 
-                                   create = FALSE )),
-                  selectizeInput("filter2", "Subgroup", choices = NULL, 
-                                 options = list( 
-                                   persist = FALSE, 
-                                   create = FALSE )) #this needs to reference the selector above!
-                )
-              )
-            ),
-            card_body(
+        page_navbar(
+          title = "",   # HEADER
+          id = "summary-navbar",
+          
+          # ---- TAB summary ----
+          nav_panel(
+            
+            "Summary",
+            
+            #removed as we don't need a sidebar for the summary
+            # layout_sidebar(
+            #   sidebar = sidebar(
+            #     value_box("SMetric A", value = "321", height = "10em",),
+            #     value_box("SMetric B", value = "654", height = "10em",),
+            #     value_box("SMetric C", value = "987", height = "10em",),
+            #     value_box("SMetric D", value = "202", height = "10em",),
+            #     value_box("SMetric E", value = "303", height = "10em",)
+            #   ),
+            
             layout_column_wrap(
-              width = 1/2,
-            value_box(title = "10 year Total Social Return on Investment",
-                      value = custom_number_format(df_ten_yr$`Total savings`[df_ten_yr$group == "all"]), #pipe this in from the data
-                      showcase = bs_icon("clipboard-data"),
-                      theme = "red", 
-                      fill = TRUE),
-            
-            value_box(title = "Some text here to describe the 10 year SROI, Some text here to describe the 10 year SROI , Some text here to describe the 10 year SROI",
-                      value = NULL, #pipe this in from the data
-                      showcase = NULL,
-                      theme = "red", 
-                      fill = TRUE)
-            )),
-            
-            
-            card(fill = FALSE,
-                 #card_header("Title"),
-                 highchartOutput("highchart_plot1")
-            )
-          )
-        #)
-      ),
-      
-      # ---- TAB Time Series ----
-      nav_panel(
-        "Time Series",
-        layout_sidebar(
-          sidebar = sidebar(
-            
-            tags$div(
-              id = "select_econ_value_box",
-              class = "value-box-button",
-              onclick = "Shiny.setInputValue('select_econ_value', Math.random())",
-              value_box(
-                title = "Economic value (10 yr)",
-                value = custom_number_format(df_ten_yr$`Economic value (GVA)`[df_ten_yr$group == "all"]),
-                height = "6em",
-                theme = value_box_theme(bg = kt_colors[2])  #"purple"
-              )
-            ),
-            
-            
-            tags$div(
-              id = "select_off_value_box",
-              class = "value-box-button",
-              onclick = "Shiny.setInputValue('select_off_value', Math.random())",
-              value_box(
-                title = "Re-offender value (10 yr)",
-                value = custom_number_format(df_ten_yr$`Reduced re-offending`[df_ten_yr$group == "all"]),
-                height = "6em",
-                theme = value_box_theme(bg = kt_colors[2])  #"yellow"
-              )
-            ),
-            
-            tags$div(
-              id = "select_dwp_value_box",
-              class = "value-box-button",
-              onclick = "Shiny.setInputValue('select_dwp_value', Math.random())",
-              value_box(
-                title = "DWP/health value (10 yr)",
-                value = custom_number_format(df_ten_yr$`DWP/health admin`[df_ten_yr$group == "all"]),
-                height = "6em",
-                theme = value_box_theme(bg = kt_colors[2]) #"red"
-              )
-            ) ,
+              width = 1/1,
+              max_height = 350,
+              min_height = 350,
+              # --- FILTER ROW ---
+              card(
+                class = "filter-card",
+                #style = "padding: 0;",
                 
-                
-            tags$div(
-              id = "select_vol_value_box",
-              class = "value-box-button",
-              onclick = "Shiny.setInputValue('select_vol_value', Math.random())",
-              value_box(
-                title = "Volunteer value (10 yr)",
-                value = custom_number_format(df_ten_yr$`Volunteer value`[df_ten_yr$group == "all"]),
-                height = "6em",
-                theme = value_box_theme(bg = kt_colors[2]) #"orange"
-              )
-            ) ,
-            
-            
-            
-            tags$div(
-              id = "select_well_value_box",
-              class = "value-box-button",
-              onclick = "Shiny.setInputValue('select_well_value', Math.random())",
-              value_box(
-                title = "Wellbeing value (10 yr)",
-                value = custom_number_format(df_ten_yr$Wellbeing[df_ten_yr$group == "all"]),
-                height = "6em",
-                theme = value_box_theme(bg = kt_colors[2]) #"white"
-              )
-            ) 
-            ),
-            
-          # Main body
-          layout_column_wrap(
-            width = 1/1,
-            max_height = 350,
-            min_height = 350,
-            # --- FILTER ROW ---
-            card(
-              class = "filter-card",
+                card_body(
+                  
+                  layout_column_wrap(
+                    width = 1/2,
+                    selectizeInput("filter1", "Parent", choices = unique(df$group_type), 
+                                   options = list( 
+                                     persist = FALSE, 
+                                     create = FALSE )),
+                    selectizeInput("filter2", "Subgroup", choices = NULL, 
+                                   options = list( 
+                                     persist = FALSE, 
+                                     create = FALSE )) #this needs to reference the selector above!
+                  )
+                )
+              ),
               card_body(
-                style = "height: 90px;",
                 layout_column_wrap(
                   width = 1/2,
-                  selectizeInput("filter3", "Subgroup parent", choices = unique(df$group_type), 
-                                 options = list( 
-                                   persist = FALSE, 
-                                   create = FALSE )),
-                  selectizeInput("filter4", "Subgroup", choices = NULL, 
-                                 options = list( 
-                                   persist = FALSE, create = FALSE )) 
+                  value_box(title = "10 year Total Social Return on Investment",
+                            value = custom_number_format(df_ten_yr$`Total savings`[df_ten_yr$group == "all"]), #pipe this in from the data
+                            showcase = bs_icon("clipboard-data"),
+                            theme = "red", 
+                            fill = TRUE),
+                  
+                  value_box(title = "Some text here to describe the 10 year SROI, Some text here to describe the 10 year SROI , Some text here to describe the 10 year SROI",
+                            value = NULL, #pipe this in from the data
+                            showcase = NULL,
+                            theme = "red", 
+                            fill = TRUE)
+                )),
+              
+              
+              card(fill = FALSE,
+                   #card_header("Title"),
+                   highchartOutput("highchart_plot1")
+              )
+            )
+            #)
+          ),
+          
+          # ---- TAB Time Series ----
+          nav_panel(
+            "Time Series",
+            layout_sidebar(
+              sidebar = sidebar(
+                
+                tags$div(
+                  id = "select_econ_value_box",
+                  class = "value-box-button",
+                  onclick = "Shiny.setInputValue('select_econ_value', Math.random())",
+                  value_box(
+                    title = "Economic value (10 yr)",
+                    value = custom_number_format(df_ten_yr$`Economic value (GVA)`[df_ten_yr$group == "all"]),
+                    height = "6em",
+                    theme = value_box_theme(bg = kt_colors[2])  #"purple"
+                  )
+                ),
+                
+                
+                tags$div(
+                  id = "select_off_value_box",
+                  class = "value-box-button",
+                  onclick = "Shiny.setInputValue('select_off_value', Math.random())",
+                  value_box(
+                    title = "Re-offender value (10 yr)",
+                    value = custom_number_format(df_ten_yr$`Reduced re-offending`[df_ten_yr$group == "all"]),
+                    height = "6em",
+                    theme = value_box_theme(bg = kt_colors[2])  #"yellow"
+                  )
+                ),
+                
+                tags$div(
+                  id = "select_dwp_value_box",
+                  class = "value-box-button",
+                  onclick = "Shiny.setInputValue('select_dwp_value', Math.random())",
+                  value_box(
+                    title = "DWP/health value (10 yr)",
+                    value = custom_number_format(df_ten_yr$`DWP/health admin`[df_ten_yr$group == "all"]),
+                    height = "6em",
+                    theme = value_box_theme(bg = kt_colors[2]) #"red"
+                  )
+                ) ,
+                
+                
+                tags$div(
+                  id = "select_vol_value_box",
+                  class = "value-box-button",
+                  onclick = "Shiny.setInputValue('select_vol_value', Math.random())",
+                  value_box(
+                    title = "Volunteer value (10 yr)",
+                    value = custom_number_format(df_ten_yr$`Volunteer value`[df_ten_yr$group == "all"]),
+                    height = "6em",
+                    theme = value_box_theme(bg = kt_colors[2]) #"orange"
+                  )
+                ) ,
+                
+                
+                
+                tags$div(
+                  id = "select_well_value_box",
+                  class = "value-box-button",
+                  onclick = "Shiny.setInputValue('select_well_value', Math.random())",
+                  value_box(
+                    title = "Wellbeing value (10 yr)",
+                    value = custom_number_format(df_ten_yr$Wellbeing[df_ten_yr$group == "all"]),
+                    height = "6em",
+                    theme = value_box_theme(bg = kt_colors[2]) #"white"
+                  )
+                ) 
+              ),
+              
+              # Main body
+              layout_column_wrap(
+                width = 1/1,
+                max_height = 350,
+                min_height = 350,
+                # --- FILTER ROW ---
+                card(
+                  class = "filter-card",
+                  card_body(
+                    style = "height: 90px;",
+                    layout_column_wrap(
+                      width = 1/2,
+                      selectizeInput("filter3", "Subgroup parent", choices = unique(df$group_type), 
+                                     options = list( 
+                                       persist = FALSE, 
+                                       create = FALSE )),
+                      selectizeInput("filter4", "Subgroup", choices = NULL, 
+                                     options = list( 
+                                       persist = FALSE, create = FALSE )) 
+                    )
+                  )
+                ),
+                
+                value_box(title = "10 year Total Social Return on Investment",
+                          value = custom_number_format(df_ten_yr$`Total savings`[df_ten_yr$group == "all"]),
+                          showcase = bs_icon("bar-chart"),theme = value_box_theme(bg = kt_colors[1]), fill = TRUE),
+                
+                card(fill = FALSE,
+                     #card_header("Title"),
+                     highchartOutput("highchart_plot2")
                 )
               )
-            ),
-            
-            value_box(title = "10 year Total Social Return on Investment",
-                      value = custom_number_format(df_ten_yr$`Total savings`[df_ten_yr$group == "all"]),
-                      showcase = bs_icon("bar-chart"),theme = value_box_theme(bg = kt_colors[1]), fill = TRUE),
-            
-            card(fill = FALSE,
-                 #card_header("Title"),
-                 highchartOutput("highchart_plot2")
+            )
+          ),
+          
+          # # ---- TAB PEOPLE ----
+          # nav_panel(
+          #   "People",
+          #   layout_sidebar(
+          #     sidebar = sidebar(
+          #       value_box("Metric A", value = "321"),
+          #       value_box("Metric B", value = "654"),
+          #       value_box("Metric C", value = "987"),
+          #       value_box("Metric D", value = "202"),
+          #       value_box("Metric E", value = "303")
+          #     ),
+          #     layout_column_wrap(
+          #       width = 1/1,
+          #       
+          #       value_box(title = "People total",value = "120,000", showcase = bs_icon("bar-chart"),theme = "blue", fill = TRUE),
+          #                 
+          #     card(fill = FALSE,
+          #       card_header("Chart"),
+          #       plotOutput("plot2")
+          #       )
+          #     )
+          #   )
+          # ),
+          
+          # ---- TAB Glossary ----
+          nav_panel(
+            "Glossary",
+            card(
+              card_header("Glossary"),
+              card_body("Glossary content goes here")
+            )
+          ),
+          
+          # ---- TAB Data Sources ----
+          nav_panel(
+            "Data Sources",
+            card(
+              card_header("Data Sources"),
+              card_body("List of sources, links, etc.")
             )
           )
-        )
-      ),
-      
-      # # ---- TAB PEOPLE ----
-      # nav_panel(
-      #   "People",
-      #   layout_sidebar(
-      #     sidebar = sidebar(
-      #       value_box("Metric A", value = "321"),
-      #       value_box("Metric B", value = "654"),
-      #       value_box("Metric C", value = "987"),
-      #       value_box("Metric D", value = "202"),
-      #       value_box("Metric E", value = "303")
-      #     ),
-      #     layout_column_wrap(
-      #       width = 1/1,
-      #       
-      #       value_box(title = "People total",value = "120,000", showcase = bs_icon("bar-chart"),theme = "blue", fill = TRUE),
-      #                 
-      #     card(fill = FALSE,
-      #       card_header("Chart"),
-      #       plotOutput("plot2")
-      #       )
-      #     )
-      #   )
-      # ),
-      
-      # ---- TAB Glossary ----
-      nav_panel(
-        "Glossary",
-        card(
-          card_header("Glossary"),
-          card_body("Glossary content goes here")
-        )
-      ),
-      
-      # ---- TAB Data Sources ----
-      nav_panel(
-        "Data Sources",
-        card(
-          card_header("Data Sources"),
-          card_body("List of sources, links, etc.")
-        )
-      )
-    ))
-)
-    
+        ))
+  )
+
 
 ########################################################################
 ########################################################################
@@ -517,7 +513,7 @@ server <- function(input, output, session) {
             #stacking = "normal" # use stack to align them
           )
         ) %>%  
-
+        
         
         # BACK BAR (TOTAL)
         hc_add_series(
@@ -572,7 +568,7 @@ server <- function(input, output, session) {
     #set up the df to feed the chart. This will change depending on user inputs
     df %>% 
       filter(group == input$filter4) %>%  # <<<< INTERACTIVE INPUT HERE
-    select(c(`Cohort years`, group, group_type, `Cohort count`, selected_column = all_of(selected_metric())))
+      select(c(`Cohort years`, group, group_type, `Cohort count`, selected_column = all_of(selected_metric())))
   })
   
   data_highchart_total_sub <- reactive({
@@ -662,9 +658,9 @@ server <- function(input, output, session) {
           column = list(
             animation = FALSE,
             grouping = FALSE) ) %>%  # don’t put series side by side
-          
         
-                 
+        
+        
         
         #bar total (CONSTANT)
         hc_add_series(name= "Total SROI",
@@ -681,54 +677,54 @@ server <- function(input, output, session) {
                       color = ifelse(input$filter3 == "all" , kt_colors[1], kt_colors[11]), #red
                       zIndex = 1) %>%
         
-
-    
+        
+        
         #line component value
-          hc_add_series(data = cht_series, #make this interactive from the side boxes
-                        type = "line",
-                        name = ifelse(selected_metric() == "Dummy","",  paste0(selected_metric(), ":<br>All ")), #how to get this out of metric_map??
-                        marker = list(symbol = 'circle'),
-                        pointPlacement = "on",
-                        color = kt_colors[5],
-                        zIndex = 50,
-                        dataLabels = list(enabled = F))
+        hc_add_series(data = cht_series, #make this interactive from the side boxes
+                      type = "line",
+                      name = ifelse(selected_metric() == "Dummy","",  paste0(selected_metric(), ":<br>All ")), #how to get this out of metric_map??
+                      marker = list(symbol = 'circle'),
+                      pointPlacement = "on",
+                      color = kt_colors[5],
+                      zIndex = 50,
+                      dataLabels = list(enabled = F))
       
       
       #condition so that sub groups don't render until a sub group selected
       if (input$filter4 != "all") {
-      highchart2 <- highchart2 %>% 
-        
-        #bar sub-group
-        hc_add_series(name= paste0("Total SROI: ", unique(data_highchart_total_sub()$group)),
-                      data = data_highchart_total_sub()$`Total savings`, #make this interactive from the side boxes
-                      type = "column",
-                      stack = "Main",
-                      color = kt_colors[1], #lihght red
-                      
-                      # Shared width logic
-                      pointPadding = 0,
-                      groupPadding = 0.2,
-                      maxPointWidth = 120,
-                      pointPlacement = 0,
-                      #position = list(offsetY = -25),
-                      
-                      zIndex = 2
-                      ) %>%
-
-        
-        #line component value sub-group
-        hc_add_series(data = cht_series_sub, #make this interactive from the side boxes
-                      type = "line",
-                      name = ifelse(str_detect(selected_metric(),"Dummy"), 
-                                    "",  
-                                    paste0(selected_metric(),":<br>", unique(data_highchart_aspect_sub()$group))), #make this interactive from the side boxes
-                      color = kt_colors[4],
-                      
-                      zIndex = 51,
-                      marker = list(symbol = 'circle'),
-                      dataLabels = list(enabled = F))}
+        highchart2 <- highchart2 %>% 
+          
+          #bar sub-group
+          hc_add_series(name= paste0("Total SROI: ", unique(data_highchart_total_sub()$group)),
+                        data = data_highchart_total_sub()$`Total savings`, #make this interactive from the side boxes
+                        type = "column",
+                        stack = "Main",
+                        color = kt_colors[1], #lihght red
+                        
+                        # Shared width logic
+                        pointPadding = 0,
+                        groupPadding = 0.2,
+                        maxPointWidth = 120,
+                        pointPlacement = 0,
+                        #position = list(offsetY = -25),
+                        
+                        zIndex = 2
+          ) %>%
+          
+          
+          #line component value sub-group
+          hc_add_series(data = cht_series_sub, #make this interactive from the side boxes
+                        type = "line",
+                        name = ifelse(str_detect(selected_metric(),"Dummy"), 
+                                      "",  
+                                      paste0(selected_metric(),":<br>", unique(data_highchart_aspect_sub()$group))), #make this interactive from the side boxes
+                        color = kt_colors[4],
+                        
+                        zIndex = 51,
+                        marker = list(symbol = 'circle'),
+                        dataLabels = list(enabled = F))}
       
-
+      
       
       highchart2
     } 

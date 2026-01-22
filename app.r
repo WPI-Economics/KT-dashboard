@@ -118,11 +118,8 @@ ui <-
             card_body(
             layout_column_wrap(
               width = 1/2,
-            value_box(title = "10 year Total Social Return on Investment",
-                      value = custom_number_format(df_ten_yr$`Total savings`[df_ten_yr$group == "all"]), #pipe this in from the data
-                      showcase = bs_icon("clipboard-data"),
-                      theme = "red", 
-                      fill = TRUE),
+        
+            uiOutput("t1_totalbox"),
             
             value_box(title = "Some text here to describe the 10 year SROI, Some text here to describe the 10 year SROI , Some text here to describe the 10 year SROI",
                       value = NULL, #pipe this in from the data
@@ -152,7 +149,7 @@ ui <-
               onclick = "Shiny.setInputValue('select_econ_value', Math.random())",
               value_box(
                 title = "Economic value (10 yr)",
-                value = custom_number_format(df_ten_yr$`Economic value (GVA)`[df_ten_yr$group == "all"]),
+                value = custom_number_format(df_ten_yr$`Economic value (GVA)`[df_ten_yr$group == "-"]),
                 height = "6em",
                 theme = value_box_theme(bg = kt_colors[2])  #"purple"
               )
@@ -165,7 +162,7 @@ ui <-
               onclick = "Shiny.setInputValue('select_off_value', Math.random())",
               value_box(
                 title = "Re-offender value (10 yr)",
-                value = custom_number_format(df_ten_yr$`Reduced re-offending`[df_ten_yr$group == "all"]),
+                value = custom_number_format(df_ten_yr$`Reduced re-offending`[df_ten_yr$group == "-"]),
                 height = "6em",
                 theme = value_box_theme(bg = kt_colors[2])  #"yellow"
               )
@@ -177,7 +174,7 @@ ui <-
               onclick = "Shiny.setInputValue('select_dwp_value', Math.random())",
               value_box(
                 title = "DWP/health value (10 yr)",
-                value = custom_number_format(df_ten_yr$`DWP/health admin`[df_ten_yr$group == "all"]),
+                value = custom_number_format(df_ten_yr$`DWP/health admin`[df_ten_yr$group == "-"]),
                 height = "6em",
                 theme = value_box_theme(bg = kt_colors[2]) #"red"
               )
@@ -190,7 +187,7 @@ ui <-
               onclick = "Shiny.setInputValue('select_vol_value', Math.random())",
               value_box(
                 title = "Volunteer value (10 yr)",
-                value = custom_number_format(df_ten_yr$`Volunteer value`[df_ten_yr$group == "all"]),
+                value = custom_number_format(df_ten_yr$`Volunteer value`[df_ten_yr$group == "-"]),
                 height = "6em",
                 theme = value_box_theme(bg = kt_colors[2]) #"orange"
               )
@@ -204,7 +201,7 @@ ui <-
               onclick = "Shiny.setInputValue('select_well_value', Math.random())",
               value_box(
                 title = "Wellbeing value (10 yr)",
-                value = custom_number_format(df_ten_yr$Wellbeing[df_ten_yr$group == "all"]),
+                value = custom_number_format(df_ten_yr$Wellbeing[df_ten_yr$group == "-"]),
                 height = "6em",
                 theme = value_box_theme(bg = kt_colors[2]) #"white"
               )
@@ -235,7 +232,7 @@ ui <-
             ),
             
             value_box(title = "10 year Total Social Return on Investment",
-                      value = custom_number_format(df_ten_yr$`Total savings`[df_ten_yr$group == "all"]),
+                      value = custom_number_format(df_ten_yr$`Total savings`[df_ten_yr$group == "-"]),
                       showcase = bs_icon("bar-chart"),theme = value_box_theme(bg = kt_colors[1]), fill = TRUE),
             
             card(fill = FALSE,
@@ -245,30 +242,8 @@ ui <-
           )
         )
       ),
+
       
-      # # ---- TAB PEOPLE ----
-      # nav_panel(
-      #   "People",
-      #   layout_sidebar(
-      #     sidebar = sidebar(
-      #       value_box("Metric A", value = "321"),
-      #       value_box("Metric B", value = "654"),
-      #       value_box("Metric C", value = "987"),
-      #       value_box("Metric D", value = "202"),
-      #       value_box("Metric E", value = "303")
-      #     ),
-      #     layout_column_wrap(
-      #       width = 1/1,
-      #       
-      #       value_box(title = "People total",value = "120,000", showcase = bs_icon("bar-chart"),theme = "blue", fill = TRUE),
-      #                 
-      #     card(fill = FALSE,
-      #       card_header("Chart"),
-      #       plotOutput("plot2")
-      #       )
-      #     )
-      #   )
-      # ),
       
       # ---- TAB Glossary ----
       nav_panel(
@@ -391,6 +366,21 @@ server <- function(input, output, session) {
          
          
          ")
+  })
+  
+  #selected subgroup value to use in data filter
+  output$t1_totalbox <- renderUI({
+    
+    selected <- state$subgroup 
+    filtered <- df_ten_yr[df_ten_yr$group %in% selected, ] 
+    total <- sum(filtered$`Total savings`, na.rm = TRUE)
+    
+    value_box(title = "10 year Total Social Return on Investment",
+              #value = custom_number_format(df_ten_yr$`Total savings`[df_ten_yr$group == "-"]), #pipe this in from the data
+              value = custom_number_format(total),
+              showcase = bs_icon("clipboard-data"),
+              theme = "red", 
+              fill = TRUE)
   })
   
   ###############

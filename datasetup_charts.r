@@ -74,7 +74,7 @@ df <- read_csv("db_data.csv") %>%
                                "2024/25")) %>% filter(!is.na(group))
 
 #subset the total/all group for a constant series in the chart
-df_all <- df %>% filter(group == "all") #%>% na.omit()
+df_all <- df %>% filter(group == "-") #%>% na.omit()
 
 df_ten_yr <- df %>% group_by(group, group_type) %>%
   summarise_if(is.numeric, sum)
@@ -215,7 +215,7 @@ kt_sroi_colors_df <- tibble(
 #background series always present
 df_total <- df %>% filter(`Cohort years` == "2024/25") %>% 
   select(-c(`Cohort count`,`Total savings`, `Dummy`)) %>% 
-  filter(group == "all"
+  filter(group == "-"
   ) %>% 
   pivot_longer(
     cols = 4:ncol(.),
