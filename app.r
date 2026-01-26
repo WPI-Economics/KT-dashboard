@@ -103,18 +103,27 @@ ui <-
               card_body(
                 
                 layout_column_wrap(
-                  width = 1/2,
-                  selectizeInput("filter1", "Parent", choices = unique(df$group_type), 
+                  width = 1/3,
+                  selectizeInput("filter1", "Group", choices = unique(df$group_type), 
                                  options = list( 
                                    persist = FALSE, 
                                    create = FALSE )),
-                  selectizeInput("filter2", "Subgroup", choices = NULL, 
+                  selectizeInput("filter2", "Subgroup", 
+                                 choices = NULL, 
+                                 options = list( 
+                                 persist = FALSE, 
+                                   create = FALSE )),
+                  
+                  selectizeInput("filter2b", "Comparison", 
+                                 choices = NULL, 
                                  options = list( 
                                    persist = FALSE, 
-                                   create = FALSE )) #this needs to reference the selector above!
-                )
-              )
-            ),
+                                   create = FALSE ,
+                                   sortField = list(list(field = "text", direction = "asc"))
+                                                    ))
+                ) #end column wrap
+              ) #end card body
+            ), #end card
             card_body(
             layout_column_wrap(
               width = 1/2,
@@ -165,14 +174,22 @@ ui <-
               card_body(
                 style = "height: 90px;",
                 layout_column_wrap(
-                  width = 1/2,
-                  selectizeInput("filter3", "Subgroup parent", choices = unique(df$group_type), 
+                  width = 1/3,
+                  selectizeInput("filter3", "Group", choices = unique(df$group_type), 
                                  options = list( 
                                    persist = FALSE, 
                                    create = FALSE )),
                   selectizeInput("filter4", "Subgroup", choices = NULL, 
+                                 options = list(
+                                 persist = FALSE, create = FALSE )) ,
+                  
+                  selectizeInput("filter4b", "Comparison", 
+                                 choices = NULL, 
                                  options = list( 
-                                   persist = FALSE, create = FALSE )) 
+                                   persist = FALSE, 
+                                   create = FALSE ,
+                                   sortField = list(list(field = "text", direction = "asc"))
+                                 ))
                 )
               )
             ),
@@ -211,10 +228,10 @@ ui <-
 )
     
 
-########################################################################
-########################################################################
-#####################         SERVER     ###############################
-########################################################################
+################################################################################################################################################
+################################################################################################################################################
+#####################         SERVER     #######################################################################################################
+################################################################################################################################################
 ########################################################################
 
 server <- function(input, output, session) {
@@ -235,7 +252,6 @@ server <- function(input, output, session) {
     state$parent <- input$filter1
     
     if (is.null(input$filter1) || input$filter1 == "") {
-      # Clear everything when parent is empty 
       session$sendCustomMessage("resetSelectize", "filter2")
       updateSelectizeInput(session, "filter2", choices = NULL, server = TRUE)
       state$subgroup <- NULL
@@ -243,12 +259,20 @@ server <- function(input, output, session) {
     }
     
     subset_choices <- unique(df$group[df$group_type == input$filter1])
-    # Clear everything when parent is empty 
+    
     session$sendCustomMessage("resetSelectize", "filter2")
+    
     updateSelectizeInput(
       session, "filter2",
       choices  = subset_choices,
       selected = subset_choices[1],
+      server   = TRUE
+    )
+    
+    updateSelectizeInput(
+      session, "filter2b",
+      choices  = c("-", subset_choices),
+      selected = "-",
       server   = TRUE
     )
     
@@ -258,12 +282,58 @@ server <- function(input, output, session) {
   # Tab 1: when filter2 changes
   observeEvent(input$filter2, {
     state$subgroup <- input$filter2
+    
+    req(input$filter1)
+    
+    subset_choices <- unique(df$group[df$group_type == input$filter1])
+    comparison_choices <- subset_choices[subset_choices != input$filter2]
+ 
+    # Reset filter2b before updating 
+    session$sendCustomMessage("resetSelectize", "filter2b")   
+    updateSelectizeInput(
+      session, "filter2b",
+      choices  = c("-", comparison_choices),
+      selected = "-",
+      server   = TRUE
+    )
   })
+  
   
   
   #################
   ################# filter stuff tab2
   #################
+  
+  # Shared filter state across tabs
+  # state2 <- reactiveValues(
+  #   parent = NULL,
+  #   subgroup = NULL
+  # )
+  # 
+  # # Tab 1: when filter1 changes
+  # observeEvent(input$filter3, {
+  #   state2$parent <- input$filter3
+  #   
+  #   if (is.null(input$filter3) || input$filter3 == "") {
+  #     # Clear everything when parent is empty 
+  #     session$sendCustomMessage("resetSelectize", "filter4")
+  #     updateSelectizeInput(session, "filter4", choices = NULL, server = TRUE)
+  #     state2$subgroup <- NULL
+  #     return()
+  #   }
+  #   
+  #   subset_choices2 <- unique(df$group[df$group_type == input$filter3])
+  #   
+  #   # Clear everything when parent is empty 
+  #   session$sendCustomMessage("resetSelectize", "filter4")
+  #   updateSelectizeInput(
+  #     session, "filter4",
+  #     choices  = subset_choices2,
+  #     selected = subset_choices2[1],
+  #     server   = TRUE
+  #   )
+  #   
+  #   state2$subgroup <- subset_choices2[1]
   
   # Shared filter state across tabs
   state2 <- reactiveValues(
@@ -276,7 +346,6 @@ server <- function(input, output, session) {
     state2$parent <- input$filter3
     
     if (is.null(input$filter3) || input$filter3 == "") {
-      # Clear everything when parent is empty 
       session$sendCustomMessage("resetSelectize", "filter4")
       updateSelectizeInput(session, "filter4", choices = NULL, server = TRUE)
       state2$subgroup <- NULL
@@ -285,8 +354,8 @@ server <- function(input, output, session) {
     
     subset_choices2 <- unique(df$group[df$group_type == input$filter3])
     
-    # Clear everything when parent is empty 
     session$sendCustomMessage("resetSelectize", "filter4")
+    
     updateSelectizeInput(
       session, "filter4",
       choices  = subset_choices2,
@@ -294,7 +363,34 @@ server <- function(input, output, session) {
       server   = TRUE
     )
     
+    updateSelectizeInput(
+      session, "filter4b",
+      choices  = c("-", subset_choices2),
+      selected = "-",
+      server   = TRUE
+    )
+    
     state2$subgroup <- subset_choices2[1]
+  })
+  
+  # Tab 1: when filter2 changes
+  observeEvent(input$filter4, {
+    state2$subgroup <- input$filter4
+    
+    req(input$filter3)
+    
+    subset_choices2 <- unique(df$group[df$group_type == input$filter3])
+    comparison_choices2 <- subset_choices2[subset_choices2 != input$filter4]
+    
+    # Reset filter2b before updating 
+    session$sendCustomMessage("resetSelectize", "filter4b")   
+    updateSelectizeInput(
+      session, "filter4b",
+      choices  = c("-", comparison_choices2),
+      selected = "-",
+      server   = TRUE
+    )
+
   })
   
   # Tab 1: when filter2 changes
@@ -577,6 +673,21 @@ server <- function(input, output, session) {
       arrange(match(`names`, df_total$names)) 
   })
   
+  data_highchart1_comparison <- reactive({
+    #set up the df to feed the chart. This will change depending on user inputs
+    df_ten_yr %>% #filter(`Cohort years` == "2024/25") %>% 
+      select(-c(`Cohort count`,`Total savings`)) %>% 
+      filter(group == input$filter2b, # <<<< INTERACTIVE INPUT HERE
+             
+      ) %>% 
+      pivot_longer(
+        cols = 3:ncol(.),
+        values_to = "values",
+        names_to = "names"
+      ) %>% 
+      arrange(match(`names`, df_total$names)) 
+  })
+  
   
   ###############
   ############### Tab1 XS chart
@@ -596,7 +707,8 @@ server <- function(input, output, session) {
         hc_plotOptions(
           column = list(
             animation = FALSE,
-            grouping = FALSE   # don’t put series side by side
+            borderRadius = 5,
+            grouping = TRUE   # put series side by side
             #stacking = "normal" # use stack to align them
           )
         ) %>%  
@@ -608,15 +720,16 @@ server <- function(input, output, session) {
         #   data = df_total$values ,
         #   type = "column",
         #   stack = "Main",
-        #   
+        # 
         #   # Shared width logic
         #   pointPadding = 0,
         #   groupPadding = 0.2,
         #   maxPointWidth = 120,
         #   pointPlacement = 0,
-        #   
+        # 
         #   borderWidth = 0,
         #   color = kt_colors[11], #kt_colors[6],
+        #   visible = F,
         #   zIndex = 1
         #   #showInLegend = FALSE
         # ) %>%
@@ -629,15 +742,18 @@ server <- function(input, output, session) {
           stack = "Main",
           
           # Must match the total series here
-          pointPadding = 0,
-          groupPadding = 0.2,
+          # pointPadding = 0,
+          groupPadding = 0.1,
           maxPointWidth = 120,
-          pointPlacement = 0,
+          #pointPlacement = 0,
           
           borderWidth = 0,
           color = kt_colors[1],
           zIndex = 2
         ) %>%
+        
+        
+
         
         hc_yAxis(title = list(text = "£")) %>%
         hc_exporting(enabled = FALSE) %>% 
@@ -645,7 +761,29 @@ server <- function(input, output, session) {
           useHTML = TRUE, 
           formatter = JS(" function() { return '£' + Highcharts.numberFormat(this.y / 1e6, 1) + 'M</b>'; } ") 
         )
-      
+
+      # Only gets added if comparison filter is selected
+      if(!is.null(input$filter2b) && input$filter2b != "-"){
+      highchart1  <- highchart1 %>%
+      # COMPARISON BAR (SUB-GROUP)
+
+      hc_add_series(
+        name = unique(data_highchart1_comparison()$group), #"All", ##<<<< interactive value
+        data = data_highchart1_comparison()$values, ##<<<< interactive value
+        type = "column",
+        stack = "comparison",
+
+        # Must match the total series here
+        # pointPadding = 0,
+         groupPadding = 0.1,
+        maxPointWidth = 120,
+        #pointPlacement = 0,
+
+        borderWidth = 0,
+        color = kt_colors[2],
+        zIndex = 2
+      ) }
+
       highchart1
       
     } 
@@ -662,6 +800,15 @@ server <- function(input, output, session) {
     select(c(`Cohort years`, group, group_type, `Cohort count`, selected_column = all_of(selected_metric())))
   })
   
+  #aspect for comparison
+  data_highchart_aspect_sub2 <- reactive({
+    #set up the df to feed the chart. This will change depending on user inputs
+    df %>% 
+      filter(group == input$filter4b) %>%  # <<<< INTERACTIVE INPUT HERE
+      select(c(`Cohort years`, group, group_type, `Cohort count`, selected_column = all_of(selected_metric())))
+  })
+  
+  #subgroup data
   data_highchart_total_sub <- reactive({
     #set up the df to feed the chart. This will change depending on user inputs
     df %>% 
@@ -669,7 +816,15 @@ server <- function(input, output, session) {
       select(c(`Cohort years`, group, group_type, `Cohort count`, `Total savings`))
   })
   
+  #comparison group data
+  data_highchart_total_sub2 <- reactive({
+    #set up the df to feed the chart. This will change depending on user inputs
+    df %>% 
+      filter(group == input$filter4b) %>%  # <<<< INTERACTIVE INPUT HERE
+      select(c(`Cohort years`, group, group_type, `Cohort count`, `Total savings`))
+  })
   
+  #All (when we have constant series behind the bar)
   data_highchart_aspect_all <- reactive({
     #set up the df to feed the chart. This will change depending on user inputs
     df_all %>% 
@@ -721,7 +876,7 @@ server <- function(input, output, session) {
             y = cht_data_sub[i],
             dataLabels = list(
               enabled = TRUE,
-              align = "left",
+              align = "right",
               y = 15,
               crop = F,
               overflow = "allow",
@@ -734,8 +889,33 @@ server <- function(input, output, session) {
       })
       
       
+      # this sets up a object for the data labels for the comparison series - USER INTERACTIVE
+      cht_data_sub2 <- data_highchart_aspect_sub2() %>% pull(selected_column)
+      
+      # Create a list of points with dataLabels only on the last one, showing series.name
+      cht_series_sub2 <- lapply(seq_along(cht_data_sub2), function(i) {
+        if (i == length(cht_data)) {
+          list(
+            y = cht_data_sub2[i],
+            dataLabels = list(
+              enabled = TRUE,
+              align = "right",
+              y = 15,
+              crop = F,
+              overflow = "allow",
+              format = "{series.name}"
+            )
+          )
+        } else {
+          list(y = cht_data_sub2[i])
+        }
+      })
+      
+      
       highchart2 <- highchart() %>% 
-        hc_chart(type = "column", spacingRight = 80) %>%
+        hc_chart(type = "column"#, 
+                 #spacingRight = 80
+                 ) %>%
         hc_title(text = "", align = "left", 
                  
                  style = list(fontSize ="24px",#color = green.pair[1], 
@@ -747,42 +927,44 @@ server <- function(input, output, session) {
         hc_yAxis(title = list(text = "£")) %>% 
         hc_plotOptions(
           column = list(
+            borderRadius = 5,
             animation = FALSE,
-            grouping = FALSE) ) %>% 
+            grouping = TRUE) ) %>% 
         hc_tooltip(
           useHTML = TRUE, 
           formatter = JS(" function() { return '£' + Highcharts.numberFormat(this.y / 1e6, 1) + 'M</b>'; } ") 
-        )
+        ) #%>% 
           
         
                  
         
-        # #bar total (CONSTANT)
+        # # #bar total (CONSTANT)
         # hc_add_series(name= "Total SROI",
         #               data = df_all$`Total savings`,
         #               type = "column",
         #               stack = "Main",
-        #               
+        # 
         #               # Shared width logic
         #               pointPadding = 0,
         #               groupPadding = 0.2,
         #               maxPointWidth = 120,
         #               pointPlacement = 0,
-        #               
+        #               visible = F,
         #               color = ifelse(input$filter3 == "all" , kt_colors[1], kt_colors[11]), #red
         #               zIndex = 1) %>%
-        
-
-    
-        #line component value
-          # hc_add_series(data = cht_series, #make this interactive from the side boxes
-          #               type = "line",
-          #               name = ifelse(selected_metric() == "Dummy","",  paste0(selected_metric(), ":<br>All ")), #how to get this out of metric_map??
-          #               marker = list(symbol = 'circle'),
-          #               pointPlacement = "on",
-          #               color = kt_colors[5],
-          #               zIndex = 50,
-          #               dataLabels = list(enabled = F))
+        # 
+        # 
+        # 
+        # #line component value
+        #   hc_add_series(data = cht_series, #make this interactive from the side boxes
+        #                 type = "line",
+        #                 name = ifelse(selected_metric() == "Dummy","",  paste0(selected_metric(), ":<br>All ")), #how to get this out of metric_map??
+        #                 marker = list(symbol = 'circle'),
+        #                 pointPlacement = "on",
+        #                 color = kt_colors[5],
+        #                 visible = F,
+        #                 zIndex = 50,
+        #                 dataLabels = list(enabled = F))
       
       
       #condition so that sub groups don't render until a sub group selected
@@ -797,10 +979,10 @@ server <- function(input, output, session) {
                       color = kt_colors[1], #lihght red
                       
                       # Shared width logic
-                      pointPadding = 0,
+                      #pointPadding = 0,
                       groupPadding = 0.2,
                       maxPointWidth = 120,
-                      pointPlacement = 0,
+                      #pointPlacement = 0,
                       #position = list(offsetY = -25),
                       
                       zIndex = 2
@@ -812,8 +994,9 @@ server <- function(input, output, session) {
                       type = "line",
                       name = ifelse(str_detect(selected_metric(),"Dummy"), 
                                     "",  
-                                    paste0(selected_metric(),":<br>", unique(data_highchart_aspect_sub()$group))), #make this interactive from the side boxes
-                      color = kt_colors[4],
+                                    paste0(selected_metric(),":<br>", 
+                                           unique(data_highchart_aspect_sub()$group))), #make this interactive from the side boxes
+                      color = kt_colors[11],
                       
                       zIndex = 51,
                       marker = list(symbol = 'circle'),
@@ -822,6 +1005,45 @@ server <- function(input, output, session) {
 
       
       highchart2
+      
+      #condition so that comparison don't render until selected
+      if (input$filter4b != "-") {
+        highchart2 <- highchart2 %>% 
+          
+          #bar sub-group
+          hc_add_series(name= paste0("Total SROI: ", unique(data_highchart_total_sub2()$group)),
+                        data = data_highchart_total_sub2()$`Total savings`, #make this interactive from the side boxes
+                        type = "column",
+                        stack = "Comparison",
+                        color = kt_colors[2], #lihght red
+                        
+                        # Shared width logic
+                        #pointPadding = 0,
+                        groupPadding = 0.2,
+                        maxPointWidth = 120,
+                        # pointPlacement = 0,
+                        #position = list(offsetY = -25),
+                        
+                        zIndex = 2
+          ) %>%
+          
+          
+          #line component value sub-group
+          hc_add_series(data = cht_series_sub2, #make this interactive from the side boxes
+                        type = "line",
+                        name = ifelse(str_detect(selected_metric(),"Dummy"), 
+                                      "",  
+                                      paste0(selected_metric(),":<br>", unique(data_highchart_aspect_sub2()$group))), #make this interactive from the side boxes
+                        color = kt_colors[7],
+                        
+                        zIndex = 51,
+                        marker = list(symbol = 'circle'),
+                        dataLabels = list(enabled = F))}
+      
+      
+      
+      highchart2
+      
     } 
     )
   
