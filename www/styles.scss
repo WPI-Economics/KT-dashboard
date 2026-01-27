@@ -72,6 +72,16 @@ h1 {
   border-bottom: 3px solid #95e8bf;
 }
 
+/*remove the sidebar sep line */
+.sidebar { border-right: none !important; 
+}
+
+
+/* remove the line under the nav */
+.bslib-sidebar-layout {
+  border-top: none !important;
+}
+
 
 
 /**/

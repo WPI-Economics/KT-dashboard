@@ -23,7 +23,7 @@ custom_number_format(1000000000)
 #theme for charts
 kt_theme <- hc_theme(
   chart = list(
-    backgroundColor = "#ffffff", 
+    backgroundColor = "#FCFCF5", 
     style = list(
       fontFamily = "Roboto"
     )
