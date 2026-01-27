@@ -18,8 +18,8 @@ my_theme <- bs_theme(version = 5,
                      base_font = "Helvetica") %>% 
   bs_add_rules(
     sass::sass_file("www/styles.scss")
-    )
-  
+  )
+
 
 ########################################################################
 ########################################################################
@@ -32,18 +32,18 @@ ui <-
   page_fillable(
     
     theme = my_theme,
-   
     
-  div(class = "container-md",
+    
+    div(class = "container-md",
         
-      div(class = "container-md",
-        id = "main-header",
-      img(src = "logo_left2.svg", id = "main-logo", class = "header-logo"),
-      tags$h1("ECONOMIC VALUE CALCULATOR 2025", id = "main-title"),
-      img(src = "logo_right.svg", id = "main-logo", class = "header-logo")
-      ),
-    
-      tags$script(HTML("
+        div(class = "container-md",
+            id = "main-header",
+            img(src = "logo_left2.svg", id = "main-logo", class = "header-logo"),
+            tags$h1("ECONOMIC VALUE CALCULATOR 2025", id = "main-title"),
+            img(src = "logo_right.svg", id = "main-logo", class = "header-logo")
+        ),
+        
+        tags$script(HTML("
   Shiny.addCustomMessageHandler('addSelectedClass', function(id) {
     $('#' + id).addClass('selected');
   });
@@ -59,174 +59,192 @@ ui <-
     }
   });
 "))
-      ,
-    #intro box
-    # Intro row
-    fluidRow(
-      column(
-        width = 12,
-        bslib::card(
-          id = "intro_box",
-          uiOutput("intro_box_copy")
-        )
-      )
-    ),
-
-    page_navbar(
-      title = "",   # HEADER
-      id = "summary-navbar",
-      
-      # ---- TAB summary ----
-      nav_panel(
-       
-        "Summary",
-        
-        #removed as we don't need a sidebar for the summary
-                # layout_sidebar(
-        #   sidebar = sidebar(
-        #     value_box("SMetric A", value = "321", height = "10em",),
-        #     value_box("SMetric B", value = "654", height = "10em",),
-        #     value_box("SMetric C", value = "987", height = "10em",),
-        #     value_box("SMetric D", value = "202", height = "10em",),
-        #     value_box("SMetric E", value = "303", height = "10em",)
-        #   ),
-        
-          layout_column_wrap(
-            width = 1/1,
-            max_height = 350,
-            min_height = 350,
-            # --- FILTER ROW ---
-            card(
-              class = "filter-card",
-              #style = "padding: 0;",
-              
-              card_body(
-                
-                layout_column_wrap(
-                  width = 1/3,
-                  selectizeInput("filter1", "Group", choices = unique(df$group_type), 
-                                 options = list( 
-                                   persist = FALSE, 
-                                   create = FALSE )),
-                  selectizeInput("filter2", "Subgroup", 
-                                 choices = NULL, 
-                                 options = list( 
-                                 persist = FALSE, 
-                                   create = FALSE )),
-                  
-                  selectizeInput("filter2b", "Comparison", 
-                                 choices = NULL, 
-                                 options = list( 
-                                   persist = FALSE, 
-                                   create = FALSE ,
-                                   sortField = list(list(field = "text", direction = "asc"))
-                                                    ))
-                ) #end column wrap
-              ) #end card body
-            ), #end card
-            card_body(
-            layout_column_wrap(
-              width = 1/2,
-        
-              #first box interactiveso in server
-            uiOutput("t1_totalbox"),
-            
-            #this one all static so all here
-            value_box(title = "Social value represents the sum total of the savings over ten years from five dimensions measured: Economic, Wellbeing, Volunteering, DWP/Health admin, and Reduced re-offending",
-                      value = NULL, #pipe this in from the data
-                      showcase = NULL,
-                      theme = "red", 
-                      fill = TRUE)
-            )),
-            
-            
-            card(fill = FALSE,
-                 #card_header("Title"),
-                 highchartOutput("highchart_plot1")
+        ,
+        #intro box
+        # Intro row
+        fluidRow(
+          column(
+            width = 12,
+            bslib::card(
+              id = "intro_box",
+              uiOutput("intro_box_copy")
             )
           )
-        #)
-      ),
-      
-      # ---- TAB Time Series ----
-      nav_panel(
-        "Time Series",
-        layout_sidebar(
-          sidebar = sidebar(
+        ),
+        
+        page_navbar(
+          title = "",   # HEADER
+          id = "summary-navbar",
+          
+          # ---- TAB summary ----
+          nav_panel(
             
-            uiOutput("t2_sidebox1"),
-            uiOutput("t2_sidebox2"),
-            uiOutput("t2_sidebox3"),
-            uiOutput("t2_sidebox4"),
-            uiOutput("t2_sidebox5")
-            ),
+            "Summary",
             
+            #removed as we don't need a sidebar for the summary
+            # layout_sidebar(
+            #   sidebar = sidebar(
+            #     value_box("SMetric A", value = "321", height = "10em",),
+            #     value_box("SMetric B", value = "654", height = "10em",),
+            #     value_box("SMetric C", value = "987", height = "10em",),
+            #     value_box("SMetric D", value = "202", height = "10em",),
+            #     value_box("SMetric E", value = "303", height = "10em",)
+            #   ),
             
-            
-          # Main body
-          layout_column_wrap(
-            width = 1/1,
-            max_height = 350,
-            min_height = 350,
-            # --- FILTER ROW ---
-            card(
-              class = "filter-card",
-              card_body(
-                style = "height: 90px;",
-                layout_column_wrap(
-                  width = 1/3,
-                  selectizeInput("filter3", "Group", choices = unique(df$group_type), 
-                                 options = list( 
-                                   persist = FALSE, 
-                                   create = FALSE )),
-                  selectizeInput("filter4", "Subgroup", choices = NULL, 
-                                 options = list(
-                                 persist = FALSE, create = FALSE )) ,
+            layout_column_wrap(
+              width = 1/1,
+              max_height = 350,
+              min_height = 350,
+              # --- FILTER ROW ---
+              card(
+                class = "filter-card",
+                #style = "padding: 0;",
+                
+                card_body(
                   
-                  selectizeInput("filter4b", "Comparison", 
-                                 choices = NULL, 
-                                 options = list( 
-                                   persist = FALSE, 
-                                   create = FALSE ,
-                                   sortField = list(list(field = "text", direction = "asc"))
-                                 ))
+                  layout_column_wrap(
+                    width = 1/3,
+                    selectizeInput("filter1", "Group", choices = unique(df$group_type), 
+                                   options = list( 
+                                     persist = FALSE, 
+                                     create = FALSE )),
+                    selectizeInput("filter2", "Subgroup", 
+                                   choices = NULL, 
+                                   options = list( 
+                                     persist = FALSE, 
+                                     create = FALSE )),
+                    
+                    selectizeInput("filter2b", "Comparison", 
+                                   choices = NULL, 
+                                   options = list( 
+                                     persist = FALSE, 
+                                     create = FALSE ,
+                                     sortField = list(list(field = "text", direction = "asc"))
+                                   ))
+                  ) #end column wrap
+                ) #end card body
+              ), #end card
+              card_body(
+                layout_column_wrap(
+                  width = 1/2,
+                  
+                  #first box interactiveso in server
+                  uiOutput("t1_totalbox"),
+                  
+                  #this one all static so all here
+                  value_box(title = "Social value represents the sum total of the savings over ten years from five dimensions measured: Economic, Wellbeing, Volunteering, DWP/Health admin, and Reduced re-offending",
+                            value = NULL, #pipe this in from the data
+                            showcase = NULL,
+                            theme = "red", 
+                            fill = TRUE)
+                )),
+              
+              
+              card(fill = FALSE,
+                   #card_header("Title"),
+                   highchartOutput("highchart_plot1")
+              )
+            )
+            #)
+          ),
+          
+          # ---- TAB Time Series ----
+          nav_panel(
+            "Time Series",
+            layout_sidebar(
+              sidebar = sidebar(
+                
+                uiOutput("t2_sidebox1"),
+                uiOutput("t2_sidebox2"),
+                uiOutput("t2_sidebox3"),
+                uiOutput("t2_sidebox4"),
+                uiOutput("t2_sidebox5")
+              ),
+              
+              
+              
+              # Main body
+              layout_column_wrap(
+                width = 1/1,
+                max_height = 350,
+                min_height = 350,
+                # --- FILTER ROW ---
+                card(
+                  class = "filter-card",
+                  card_body(
+                    style = "height: 90px;",
+                    layout_column_wrap(
+                      width = 1/3,
+                      selectizeInput("filter3", "Group", choices = unique(df$group_type), 
+                                     options = list( 
+                                       persist = FALSE, 
+                                       create = FALSE )),
+                      selectizeInput("filter4", "Subgroup", choices = NULL, 
+                                     options = list(
+                                       persist = FALSE, create = FALSE )) ,
+                      
+                      selectizeInput("filter4b", "Comparison", 
+                                     choices = NULL, 
+                                     options = list( 
+                                       persist = FALSE, 
+                                       create = FALSE ,
+                                       sortField = list(list(field = "text", direction = "asc"))
+                                     ))
+                    )
+                  )
+                ),
+                
+                #red total box
+                uiOutput("t1_totalbox2"),
+                
+                card(fill = FALSE,
+                     #card_header("Title"),
+                     highchartOutput("highchart_plot2")
                 )
               )
-            ),
-            
-#red total box
-            uiOutput("t1_totalbox2"),
-            
-            card(fill = FALSE,
-                 #card_header("Title"),
-                 highchartOutput("highchart_plot2")
+            )
+          ),
+          
+          
+          
+          # ---- TAB Glossary ----
+          nav_panel(
+            "Glossary",
+            card(
+              card_header("Glossary"),
+              card_body(HTML("<h3>Social value:</h3><p>This is the sum of the savings across the various dimensions</p><br>
+                    <h3>Economic value:</h3><p>description here</p><br>
+                    <h3>Wellbeing:</h3><p>description here</p><br>
+                    <h3>Volunteer value:</h3><p>description here</p><br>
+                    <h3>DWP/Health admin:</h3><p>description here</p><br>
+                    <h3>Reduced re-offending:</h3><p>description here</p><br>
+                    "))
+            )
+          ),
+          
+          # ---- TAB Data Sources ----
+          nav_panel(
+            "Data Sources",
+            card(
+              card_header("Data Sources"),
+              card_body(HTML("<h3>Kings Trust Sources:</h3>
+                             <p><b>Partipants</B> extracted xx/xx/xx, covering 2015/16 to 2024/25</p>
+                             <p><b>Outcomes</B> extracted xx/xx/xx, covering 2015/16 to 2024/25</p>
+                             <p><b>My Journey</B> extracted xx/xx/xx, covering 2015/16 to 2024/25</p>
+                             <p><b>Health and Social care outcomes</B> extracted xx/xx/xx, covering 2015/16 to 2024/25</p>
+                             <p><b>Volunteers</B> extracted xx/xx/xx, covering 2015/16 to 2024/25</p>
+                             
+                             <h3>External sources</h3>
+                             <p><b>Annual Population Survey, ONS</b> Used for deadweight calculations
+                             <p><b>Labour productivity (GVA), ONS</b> Used for GVA calculations
+                             <p><b>Wellbeing, ONS</b> Used for deadweight calculations
+                             <p><b>Consumer prices index (housing), ONS</b> Used for deflators
+                             "))
             )
           )
-        )
-      ),
+        ))
+  )
 
-      
-      
-      # ---- TAB Glossary ----
-      nav_panel(
-        "Glossary",
-        card(
-          card_header("Glossary"),
-          card_body("Glossary content goes here")
-        )
-      ),
-      
-      # ---- TAB Data Sources ----
-      nav_panel(
-        "Data Sources",
-        card(
-          card_header("Data Sources"),
-          card_body("List of sources, links, etc.")
-        )
-      )
-    ))
-)
-    
 
 ################################################################################################################################################
 ################################################################################################################################################
@@ -287,7 +305,7 @@ server <- function(input, output, session) {
     
     subset_choices <- unique(df$group[df$group_type == input$filter1])
     comparison_choices <- subset_choices[subset_choices != input$filter2]
- 
+    
     # Reset filter2b before updating 
     session$sendCustomMessage("resetSelectize", "filter2b")   
     updateSelectizeInput(
@@ -390,7 +408,7 @@ server <- function(input, output, session) {
       selected = "-",
       server   = TRUE
     )
-
+    
   })
   
   # Tab 1: when filter2 changes
@@ -443,14 +461,14 @@ server <- function(input, output, session) {
   ############### clickable cards as selectors
   ###############
   
-
-
+  
+  
   output$t2_sidebox1 <- renderUI({
     # data logic
     selected <- state2$subgroup
     filtered <- df_ten_yr[df_ten_yr$group %in% selected, ]
     total <- sum(filtered$`Economic value (GVA)`, na.rm = TRUE)
-
+    
     # build the UI
     ui <- tags$div(
       id = "select_econ_value_box",
@@ -463,7 +481,7 @@ server <- function(input, output, session) {
         theme = value_box_theme(bg = kt_colors[2])
       )
     )
-
+    
     # re-apply the selected class AFTER the DOM is updated
     session$onFlushed(function() {
       val = isolate(selected_metric_id())
@@ -471,12 +489,12 @@ server <- function(input, output, session) {
         session$sendCustomMessage("addSelectedClass", "select_econ_value_box")
       }
     }, once = FALSE)
-
+    
     ui
   })
-
-
-
+  
+  
+  
   output$t2_sidebox2 <- renderUI({
     #the data logic
     selected <- state2$subgroup
@@ -505,14 +523,14 @@ server <- function(input, output, session) {
     
     ui
   })
-
+  
   output$t2_sidebox3 <- renderUI({
     #the data logic
     selected <- state2$subgroup
     filtered <- df_ten_yr[df_ten_yr$group %in% selected, ]
     total <- sum(filtered$"DWP/health admin", na.rm = TRUE)
     #the box
-   ui <- tags$div(
+    ui <- tags$div(
       id = "select_dwp_value_box",
       class = "value-box-button",
       onclick = "Shiny.setInputValue('select_dwp_value', Math.random())",
@@ -523,26 +541,26 @@ server <- function(input, output, session) {
         theme = value_box_theme(bg = kt_colors[2]) #"red"
       )
     )
-   # re-apply the selected class AFTER the DOM is updated
-   session$onFlushed(function() {
-     val = isolate(selected_metric_id())
-     if (!is.null(val) && val == "select_dwp_value") {
-       session$sendCustomMessage("addSelectedClass", "select_dwp_value_box")
-     }
-   }, once = FALSE)
-   
-   ui
-   
+    # re-apply the selected class AFTER the DOM is updated
+    session$onFlushed(function() {
+      val = isolate(selected_metric_id())
+      if (!is.null(val) && val == "select_dwp_value") {
+        session$sendCustomMessage("addSelectedClass", "select_dwp_value_box")
+      }
+    }, once = FALSE)
+    
+    ui
+    
   })
-
-
+  
+  
   output$t2_sidebox4 <- renderUI({
     #the data logic
     selected <- state2$subgroup
     filtered <- df_ten_yr[df_ten_yr$group %in% selected, ]
     total <- sum(filtered$"Wellbeing", na.rm = TRUE)
     #the box
-   ui <- tags$div(
+    ui <- tags$div(
       id = "select_well_value_box",
       class = "value-box-button",
       onclick = "Shiny.setInputValue('select_well_value', Math.random())",
@@ -553,24 +571,24 @@ server <- function(input, output, session) {
         theme = value_box_theme(bg = kt_colors[2]) #"white"
       )
     )
-   # re-apply the selected class AFTER the DOM is updated
-   session$onFlushed(function() {
-     val = isolate(selected_metric_id())
-     if (!is.null(val) && val == "select_well_value") {
-       session$sendCustomMessage("addSelectedClass", "select_well_value_box")
-     }
-   }, once = FALSE)
-   
-   ui
+    # re-apply the selected class AFTER the DOM is updated
+    session$onFlushed(function() {
+      val = isolate(selected_metric_id())
+      if (!is.null(val) && val == "select_well_value") {
+        session$sendCustomMessage("addSelectedClass", "select_well_value_box")
+      }
+    }, once = FALSE)
+    
+    ui
   })
-
+  
   output$t2_sidebox5 <- renderUI({
     #the data logic
     selected <- state2$subgroup
     filtered <- df_ten_yr[df_ten_yr$group %in% selected, ]
     total <- sum(filtered$"Volunteer value", na.rm = TRUE)
     #the box
-  ui <- tags$div(
+    ui <- tags$div(
       id = "select_vol_value_box",
       class = "value-box-button",
       onclick = "Shiny.setInputValue('select_vol_value', Math.random())",
@@ -581,17 +599,17 @@ server <- function(input, output, session) {
         theme = value_box_theme(bg = kt_colors[2]) #"orange"
       )
     )
-  # re-apply the selected class AFTER the DOM is updated
-  session$onFlushed(function() {
-    val = isolate(selected_metric_id())
-    if (!is.null(val) && val == "select_vol_value") {
-      session$sendCustomMessage("addSelectedClass", "select_vol_value_box")
-    }
-  }, once = FALSE)
-
-  ui
+    # re-apply the selected class AFTER the DOM is updated
+    session$onFlushed(function() {
+      val = isolate(selected_metric_id())
+      if (!is.null(val) && val == "select_vol_value") {
+        session$sendCustomMessage("addSelectedClass", "select_vol_value_box")
+      }
+    }, once = FALSE)
+    
+    ui
   })
- 
+  
   
   #  1 Define the mapping (static, non-reactive)
   metric_map <- c(
@@ -606,7 +624,7 @@ server <- function(input, output, session) {
   selected_metric <- reactiveVal("Dummy")  # default
   selected_metric_id <- reactiveVal(NULL)
   # 3 Observe all value-box buttons
-
+  
   observeEvent(input$select_econ_value, {
     selected_metric(metric_map[["select_econ_value"]])
     selected_metric_id("select_econ_value")
@@ -712,7 +730,7 @@ server <- function(input, output, session) {
             #stacking = "normal" # use stack to align them
           )
         ) %>%  
-
+        
         
         # BACK BAR (TOTAL)
         # hc_add_series(
@@ -753,44 +771,44 @@ server <- function(input, output, session) {
         ) %>%
         
         
-
+        
         
         hc_yAxis(#title = list(text = "£"),
-                 labels = list(
-                   formatter = JS(" function() { return '£' + Highcharts.numberFormat(this.value / 1e6, 0, '.', ',') + 'M</b>'; } ") 
-                 )) %>% 
+          labels = list(
+            formatter = JS(" function() { return '£' + Highcharts.numberFormat(this.value / 1e6, 0, '.', ',') + 'M</b>'; } ") 
+          )) %>% 
         
         hc_exporting(enabled = FALSE) %>% 
         hc_tooltip(
           useHTML = TRUE, 
           formatter = JS(" function() { return '£' + Highcharts.numberFormat(this.y / 1e6, 0, '.', ',') + 'M</b>'; } ") 
         ) %>% 
-       hc_add_theme(kt_theme)
-        
+        hc_add_theme(kt_theme)
       
-
+      
+      
       # Only gets added if comparison filter is selected
       if(!is.null(input$filter2b) && input$filter2b != "-"){
-      highchart1  <- highchart1 %>%
-      # COMPARISON BAR (SUB-GROUP)
-
-      hc_add_series(
-        name = unique(data_highchart1_comparison()$group), #"All", ##<<<< interactive value
-        data = data_highchart1_comparison()$values, ##<<<< interactive value
-        type = "column",
-        stack = "comparison",
-
-        # Must match the total series here
-        # pointPadding = 0,
-         groupPadding = 0.1,
-        maxPointWidth = 120,
-        #pointPlacement = 0,
-
-        borderWidth = 0,
-        color = kt_colors[2],
-        zIndex = 2
-      ) }
-
+        highchart1  <- highchart1 %>%
+          # COMPARISON BAR (SUB-GROUP)
+          
+          hc_add_series(
+            name = unique(data_highchart1_comparison()$group), #"All", ##<<<< interactive value
+            data = data_highchart1_comparison()$values, ##<<<< interactive value
+            type = "column",
+            stack = "comparison",
+            
+            # Must match the total series here
+            # pointPadding = 0,
+            groupPadding = 0.1,
+            maxPointWidth = 120,
+            #pointPlacement = 0,
+            
+            borderWidth = 0,
+            color = kt_colors[2],
+            zIndex = 2
+          ) }
+      
       highchart1
       
     } 
@@ -804,7 +822,7 @@ server <- function(input, output, session) {
     #set up the df to feed the chart. This will change depending on user inputs
     df %>% 
       filter(group == input$filter4) %>%  # <<<< INTERACTIVE INPUT HERE
-    select(c(`Cohort years`, group, group_type, `Cohort count`, selected_column = all_of(selected_metric())))
+      select(c(`Cohort years`, group, group_type, `Cohort count`, selected_column = all_of(selected_metric())))
   })
   
   #aspect for comparison
@@ -923,7 +941,7 @@ server <- function(input, output, session) {
       highchart2 <- highchart() %>% 
         hc_chart(type = "column"#, 
                  #spacingRight = 80
-                 ) %>%
+        ) %>%
         hc_title(text = "", align = "left", 
                  
                  style = list(fontSize ="24px",#color = green.pair[1], 
@@ -933,9 +951,9 @@ server <- function(input, output, session) {
         hc_xAxis(categories = df_all$`Cohort years`, #substitute this for the selected interactive filter input
                  title = list(text = "")) %>% 
         hc_yAxis(#title = list(text = "£"),
-                 labels = list(
-                   formatter = JS(" function() { return '£' + Highcharts.numberFormat(this.value / 1e6, 0, '.', ',') + 'M</b>'; } ") 
-                 )) %>% 
+          labels = list(
+            formatter = JS(" function() { return '£' + Highcharts.numberFormat(this.value / 1e6, 0, '.', ',') + 'M</b>'; } ") 
+          )) %>% 
         hc_plotOptions(
           column = list(
             borderRadius = 5,
@@ -946,75 +964,75 @@ server <- function(input, output, session) {
           formatter = JS(" function() { return '£' + Highcharts.numberFormat(this.y / 1e6, 0, '.', ',') + 'M</b>'; } ") 
         ) %>% 
         hc_add_theme(kt_theme) 
-          
-        
-                 
-        
-        # # #bar total (CONSTANT)
-        # hc_add_series(name= "Total SROI",
-        #               data = df_all$`Total savings`,
-        #               type = "column",
-        #               stack = "Main",
-        # 
-        #               # Shared width logic
-        #               pointPadding = 0,
-        #               groupPadding = 0.2,
-        #               maxPointWidth = 120,
-        #               pointPlacement = 0,
-        #               visible = F,
-        #               color = ifelse(input$filter3 == "all" , kt_colors[1], kt_colors[11]), #red
-        #               zIndex = 1) %>%
-        # 
-        # 
-        # 
-        # #line component value
-        #   hc_add_series(data = cht_series, #make this interactive from the side boxes
-        #                 type = "line",
-        #                 name = ifelse(selected_metric() == "Dummy","",  paste0(selected_metric(), ":<br>All ")), #how to get this out of metric_map??
-        #                 marker = list(symbol = 'circle'),
-        #                 pointPlacement = "on",
-        #                 color = kt_colors[5],
-        #                 visible = F,
-        #                 zIndex = 50,
-        #                 dataLabels = list(enabled = F))
+      
+      
+      
+      
+      # # #bar total (CONSTANT)
+      # hc_add_series(name= "Total SROI",
+      #               data = df_all$`Total savings`,
+      #               type = "column",
+      #               stack = "Main",
+      # 
+      #               # Shared width logic
+      #               pointPadding = 0,
+      #               groupPadding = 0.2,
+      #               maxPointWidth = 120,
+      #               pointPlacement = 0,
+      #               visible = F,
+      #               color = ifelse(input$filter3 == "all" , kt_colors[1], kt_colors[11]), #red
+      #               zIndex = 1) %>%
+      # 
+      # 
+      # 
+      # #line component value
+      #   hc_add_series(data = cht_series, #make this interactive from the side boxes
+      #                 type = "line",
+      #                 name = ifelse(selected_metric() == "Dummy","",  paste0(selected_metric(), ":<br>All ")), #how to get this out of metric_map??
+      #                 marker = list(symbol = 'circle'),
+      #                 pointPlacement = "on",
+      #                 color = kt_colors[5],
+      #                 visible = F,
+      #                 zIndex = 50,
+      #                 dataLabels = list(enabled = F))
       
       
       #condition so that sub groups don't render until a sub group selected
       if (input$filter4 != "all") {
-      highchart2 <- highchart2 %>% 
-        
-        #bar sub-group
-        hc_add_series(name= paste0("Total SROI: ", unique(data_highchart_total_sub()$group)),
-                      data = data_highchart_total_sub()$`Total savings`, #make this interactive from the side boxes
-                      type = "column",
-                      stack = "Main",
-                      color = kt_colors[1], #lihght red
-                      
-                      # Shared width logic
-                      #pointPadding = 0,
-                      groupPadding = 0.2,
-                      maxPointWidth = 120,
-                      #pointPlacement = 0,
-                      #position = list(offsetY = -25),
-                      
-                      zIndex = 2
-                      ) %>%
-
-        
-        #line component value sub-group
-        hc_add_series(data = cht_series_sub, #make this interactive from the side boxes
-                      type = "line",
-                      name = ifelse(str_detect(selected_metric(),"Dummy"), 
-                                    "",  
-                                    paste0(selected_metric(),":<br>", 
-                                           unique(data_highchart_aspect_sub()$group))), #make this interactive from the side boxes
-                      color = kt_colors[11],
-                      
-                      zIndex = 51,
-                      marker = list(symbol = 'circle'),
-                      dataLabels = list(enabled = F))}
+        highchart2 <- highchart2 %>% 
+          
+          #bar sub-group
+          hc_add_series(name= paste0("Total SROI: ", unique(data_highchart_total_sub()$group)),
+                        data = data_highchart_total_sub()$`Total savings`, #make this interactive from the side boxes
+                        type = "column",
+                        stack = "Main",
+                        color = kt_colors[1], #lihght red
+                        
+                        # Shared width logic
+                        #pointPadding = 0,
+                        groupPadding = 0.2,
+                        maxPointWidth = 120,
+                        #pointPlacement = 0,
+                        #position = list(offsetY = -25),
+                        
+                        zIndex = 2
+          ) %>%
+          
+          
+          #line component value sub-group
+          hc_add_series(data = cht_series_sub, #make this interactive from the side boxes
+                        type = "line",
+                        name = ifelse(str_detect(selected_metric(),"Dummy"), 
+                                      "",  
+                                      paste0(selected_metric(),":<br>", 
+                                             unique(data_highchart_aspect_sub()$group))), #make this interactive from the side boxes
+                        color = kt_colors[11],
+                        
+                        zIndex = 51,
+                        marker = list(symbol = 'circle'),
+                        dataLabels = list(enabled = F))}
       
-
+      
       
       highchart2
       
