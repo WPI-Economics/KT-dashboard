@@ -38,7 +38,7 @@ ui <-
         
       div(class = "container-md",
         id = "main-header",
-      img(src = "logo_left.svg", id = "main-logo", class = "header-logo"),
+      img(src = "logo_left2.svg", id = "main-logo", class = "header-logo"),
       tags$h1("ECONOMIC VALUE CALCULATOR 2025", id = "main-title"),
       img(src = "logo_right.svg", id = "main-logo", class = "header-logo")
       ),
@@ -132,7 +132,7 @@ ui <-
             uiOutput("t1_totalbox"),
             
             #this one all static so all here
-            value_box(title = "Some text here to describe the 10 year SROI, Some text here to describe the 10 year SROI , Some text here to describe the 10 year SROI",
+            value_box(title = "Social value represents the sum total of the savings over ten years from five dimensions measured: Economic, Wellbeing, Volunteering, DWP/Health admin, and Reduced re-offending",
                       value = NULL, #pipe this in from the data
                       showcase = NULL,
                       theme = "red", 
@@ -416,7 +416,7 @@ server <- function(input, output, session) {
     filtered <- df_ten_yr[df_ten_yr$group %in% selected, ] 
     total <- sum(filtered$`Total savings`, na.rm = TRUE)
     
-    value_box(title = "10 year Total Social Return on Investment",
+    value_box(title = "10 year social value",
               #value = custom_number_format(df_ten_yr$`Total savings`[df_ten_yr$group == "-"]), #pipe this in from the data
               value = custom_number_format(total),
               showcase = bs_icon("clipboard-data"),
@@ -755,12 +755,19 @@ server <- function(input, output, session) {
         
 
         
-        hc_yAxis(title = list(text = "£")) %>%
+        hc_yAxis(#title = list(text = "£"),
+                 labels = list(
+                   formatter = JS(" function() { return '£' + Highcharts.numberFormat(this.value / 1e6, 0, '.', ',') + 'M</b>'; } ") 
+                 )) %>% 
+        
         hc_exporting(enabled = FALSE) %>% 
         hc_tooltip(
           useHTML = TRUE, 
-          formatter = JS(" function() { return '£' + Highcharts.numberFormat(this.y / 1e6, 1) + 'M</b>'; } ") 
-        )
+          formatter = JS(" function() { return '£' + Highcharts.numberFormat(this.y / 1e6, 0, '.', ',') + 'M</b>'; } ") 
+        ) %>% 
+       hc_add_theme(kt_theme)
+        
+      
 
       # Only gets added if comparison filter is selected
       if(!is.null(input$filter2b) && input$filter2b != "-"){
@@ -903,7 +910,8 @@ server <- function(input, output, session) {
               y = 15,
               crop = F,
               overflow = "allow",
-              format = "{series.name}"
+              format = "{series.name}",
+              style = list( fontWeight = "normal") # ← unbold the label
             )
           )
         } else {
@@ -924,7 +932,10 @@ server <- function(input, output, session) {
         
         hc_xAxis(categories = df_all$`Cohort years`, #substitute this for the selected interactive filter input
                  title = list(text = "")) %>% 
-        hc_yAxis(title = list(text = "£")) %>% 
+        hc_yAxis(#title = list(text = "£"),
+                 labels = list(
+                   formatter = JS(" function() { return '£' + Highcharts.numberFormat(this.value / 1e6, 0, '.', ',') + 'M</b>'; } ") 
+                 )) %>% 
         hc_plotOptions(
           column = list(
             borderRadius = 5,
@@ -932,8 +943,9 @@ server <- function(input, output, session) {
             grouping = TRUE) ) %>% 
         hc_tooltip(
           useHTML = TRUE, 
-          formatter = JS(" function() { return '£' + Highcharts.numberFormat(this.y / 1e6, 1) + 'M</b>'; } ") 
-        ) #%>% 
+          formatter = JS(" function() { return '£' + Highcharts.numberFormat(this.y / 1e6, 0, '.', ',') + 'M</b>'; } ") 
+        ) %>% 
+        hc_add_theme(kt_theme) 
           
         
                  

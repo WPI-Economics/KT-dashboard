@@ -20,6 +20,20 @@ custom_number_format(1000000)
 custom_number_format(999900000)
 custom_number_format(1000000000)
 
+#theme for charts
+kt_theme <- hc_theme(
+  chart = list(
+    backgroundColor = "#ffffff", 
+    style = list(
+      fontFamily = "Roboto"
+    )
+  ),
+  tooltip = list(
+    style = list(
+      fontFamily = "Arial"
+    )
+  ))
+
 
 #####################
 ##################### 1.0 define colours
@@ -31,12 +45,16 @@ kt_colors <- c("#CC0033", #1 red
                "#28D796", #3 limegreen
                "#5009B0", #4 purple
                "#323232", #5 charcoal
-               "#F2F2F2", #6 grey
+               "#FCFCF5", #14 off white
+              
                "#7a6da0", #7 mid-purple
                "#a69bbf", #8 light purple
                "#95e8bf", #9 mid green
                "#def6e9", #10 light green
-               "#ddb6b3" #11 light red
+               "#ddb6b3", #11 light red
+               "#E6CF01", #12 yellow
+               "#C3C3C3" ,#13 steel grey
+               "#E6e6e6" #6 grey
                ) 
 
 #####################
