@@ -101,8 +101,8 @@ fy_levels <- unique(df$`Cohort years`)
 #subset the total/all group for a constant series in the chart
 df_all <- df %>% filter(group == "-") #%>% na.omit()
 
-df_ten_yr <- df %>% group_by(group, group_type) %>%
-  summarise_if(is.numeric, sum)
+# df_ten_yr <- df %>% group_by(group, group_type) %>%
+#   summarise_if(is.numeric, sum)
   
 
 #set up a color lookup for the chart
