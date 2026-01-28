@@ -93,6 +93,34 @@ h1 {
 }
 
 
+/* the flipping range slider is HORRIBLE to style */
+/* Apply to your slider container class */
+.form-group .irs--shiny .irs-bar {
+  background-color: #1E1964 !important;
+}
+
+/* Handles */
+.form-group .irs--shiny .irs-handle {
+  background-color: #28D796 !important;
+  border-color: #28D796 !important;
+}
+
+/* Label bubbles */
+.form-group .irs--shiny .irs-from,
+.form-group .irs--shiny .irs-to,
+.form-group .irs--shiny .irs-single {
+  background-color: #1E1964 !important;
+  color: #fff !important;
+}
+
+/* Min/max labels */
+.form-group .irs--shiny .irs-min,
+.form-group .irs--shiny .irs-max {
+  color: #1E1964 !important;
+}
+
+
+
 
 /**/
 /* specific interactives*/

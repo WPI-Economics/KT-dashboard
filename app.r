@@ -6,6 +6,7 @@ library(bslib)
 library(bsicons)
 library(sass)
 library(downloadthis)
+library(shinyWidgets)
 
 
 #read in data, colours and highchart chart
@@ -167,13 +168,13 @@ ui <-
               # Main body
               layout_column_wrap(
                 width = 1/1,
-                max_height = 350,
-                min_height = 350,
+                max_height = 450,
+                min_height = 450,
                 # --- FILTER ROW ---
                 card(
                   class = "filter-card",
                   card_body(
-                    style = "height: 90px;",
+                    style = "height: 80px;",
                     layout_column_wrap(
                       width = 1/3,
                       selectizeInput("filter3", "Group", choices = unique(df$group_type), 
@@ -197,6 +198,13 @@ ui <-
                 
                 #red total box
                 uiOutput("t1_totalbox2"),
+                
+                # #time filter
+                 sliderTextInput("fy-range",
+                 "",
+                 choices = unique(df$`Cohort years`),
+                 selected = c(fy_levels[1], fy_levels[length(fy_levels)]),
+                 grid = FALSE),
                 
                 card(fill = FALSE,
                      #card_header("Title"),
@@ -435,6 +443,8 @@ server <- function(input, output, session) {
     )
   })
   
+  
+  
   #selected subgroup value to use in data filter
   output$t1_totalbox <- renderUI({
     
@@ -457,7 +467,7 @@ server <- function(input, output, session) {
     filtered <- df_ten_yr[df_ten_yr$group %in% selected, ] 
     total <- sum(filtered$`Total savings`, na.rm = TRUE)
     
-    value_box(title = "10 year Total Social Return on Investment",
+    value_box(title = paste0("ADD INTERACTIVE","Social value"), #make the 
               #value = custom_number_format(df_ten_yr$`Total savings`[df_ten_yr$group == "-"]), #pipe this in from the data
               value = custom_number_format(total),
               showcase = bs_icon("clipboard-data"),

@@ -95,6 +95,8 @@ df <- read_csv("db_data.csv") %>%
 numeric_cols <- colnames(df[sapply(df, is.numeric)]) #identify numeric columns
 df[numeric_cols] <- sapply(df[numeric_cols], function(x){round(x,0)})
 
+#stash the years in a vector
+fy_levels <- unique(df$`Cohort years`)
 
 #subset the total/all group for a constant series in the chart
 df_all <- df %>% filter(group == "-") #%>% na.omit()
