@@ -5,6 +5,7 @@ library(highcharter)
 library(bslib)
 library(bsicons)
 library(sass)
+library(downloadthis)
 
 
 #read in data, colours and highchart chart
@@ -418,13 +419,20 @@ server <- function(input, output, session) {
   
   #the copy for the umm intro box!
   output$intro_box_copy <- renderUI({
-    HTML("<span class='intro_copy'> This dashboard presents the headline results of the King's Trust Social Returns on Investment (SROI) economic analysis done in collaboration with WPI Economics. <br><br>
+   tagList(HTML("<span class='intro_copy'> This dashboard presents the headline results of the King's Trust Social Returns on Investment (SROI) economic analysis done in collaboration with WPI Economics. <br><br>
          The summary tab below gives results aggregated over the ten year period from 2015/16 to 2024/25 split by 5 components. Use the filters to select a sub group of interest.<br><br>
          The `Time Series` tab gives results over time. Use the blue buttons on the left to add one of the five components to the chart and also use the filters to select sub-groups of interest.<br><br>
-         Worth noting that the series can be switched off from the legend of each chart if a metric is overpowering a chart!
-         
-         
-         ")
+         Worth noting that the series can be switched off from the legend of each chart if a metric is overpowering a chart!<br>"),
+   div(
+     style = "text-align: center; margin-top: 10px;",
+    download_this(
+      .data = df,
+      output_name = "sroi_data", 
+      output_extension = ".xlsx", 
+      button_label = "Download data", 
+      button_type = "default"
+    ))
+    )
   })
   
   #selected subgroup value to use in data filter
@@ -783,7 +791,11 @@ server <- function(input, output, session) {
           useHTML = TRUE, 
           formatter = JS(" function() { return '£' + Highcharts.numberFormat(this.y / 1e6, 0, '.', ',') + 'M</b>'; } ") 
         ) %>% 
-        hc_add_theme(kt_theme)
+        hc_add_theme(kt_theme) %>% 
+        hc_exporting(enabled = TRUE,
+                     buttons = list(
+                       contextButton = list(
+                         menuItems = c("downloadSVG","downloadPNG", "downloadXLS"))))
       
       
       
@@ -963,7 +975,11 @@ server <- function(input, output, session) {
           useHTML = TRUE, 
           formatter = JS(" function() { return '£' + Highcharts.numberFormat(this.y / 1e6, 0, '.', ',') + 'M</b>'; } ") 
         ) %>% 
-        hc_add_theme(kt_theme) 
+        hc_add_theme(kt_theme) %>% 
+        hc_exporting(enabled = TRUE,
+                     buttons = list(
+                       contextButton = list(
+                         menuItems = c("downloadSVG","downloadPNG", "downloadXLS"))))
       
       
       
