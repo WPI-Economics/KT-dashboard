@@ -116,7 +116,7 @@ ui <-
                                      persist = FALSE, 
                                      create = FALSE )),
                     
-                    selectizeInput("filter2b", "Comparison", 
+                    selectizeInput("filter2b", "Comparison (chart only)", 
                                    choices = NULL, 
                                    options = list( 
                                      persist = FALSE, 
@@ -134,7 +134,7 @@ ui <-
                   uiOutput("t1_totalbox"),
                   
                   #this one all static so all here
-                  value_box(title = "Social value represents the sum total of the savings over ten years from five dimensions measured: Economic, Wellbeing, Volunteering, DWP/Health admin, and Reduced re-offending",
+                  value_box(title = "Social value represents total savings from five dimensions: Economic, Wellbeing, Volunteering, DWP/Health admin, and Reduced re-offending",
                             value = NULL, #pipe this in from the data
                             showcase = NULL,
                             theme = "red", 
@@ -150,7 +150,7 @@ ui <-
             #)
           ),
           
-          # ---- TAB Time Series ----
+          # ---- TAB 2Time Series ----
           nav_panel(
             "Time Series",
             layout_sidebar(
@@ -168,8 +168,8 @@ ui <-
               # Main body
               layout_column_wrap(
                 width = 1/1,
-                max_height = 450,
-                min_height = 450,
+                max_height = 350,
+                min_height = 350,
                 # --- FILTER ROW ---
                 card(
                   class = "filter-card",
@@ -185,7 +185,7 @@ ui <-
                                      options = list(
                                        persist = FALSE, create = FALSE )) ,
                       
-                      selectizeInput("filter4b", "Comparison", 
+                      selectizeInput("filter4b", "Comparison (chart only)", 
                                      choices = NULL, 
                                      options = list( 
                                        persist = FALSE, 
@@ -197,18 +197,25 @@ ui <-
                 ),
                 
                 #red total box
-                uiOutput("t1_totalbox2"),
+                div(
+                  class = "sv-summary-row", 
+                  uiOutput("t1_totalbox2")
+                ),
                 
                 # #time filter
+                div(
+                  class = "fy-slider-row",
                  sliderTextInput("fy_range",
                  "",
                  choices = unique(df$`Cohort years`),
                  selected = c(fy_levels[1], fy_levels[length(fy_levels)]),
-                 grid = FALSE),
+                 grid = FALSE,
+                 width = "100%"),
                 
                 card(fill = FALSE,
                      #card_header("Title"),
                      highchartOutput("highchart_plot2")
+                     )
                 )
               )
             )
@@ -423,10 +430,9 @@ server <- function(input, output, session) {
   
   #the copy for the umm intro box!
   output$intro_box_copy <- renderUI({
-   tagList(HTML("<span class='intro_copy'> This dashboard presents the headline results of the King's Trust Social Returns on Investment (SROI) economic analysis done in collaboration with WPI Economics. <br><br>
-         The summary tab below gives results aggregated over the ten year period from 2015/16 to 2024/25 split by 5 components. Use the filters to select a sub group of interest.<br><br>
-         The `Time Series` tab gives results over time. Use the blue buttons on the left to add one of the five components to the chart and also use the filters to select sub-groups of interest.<br><br>
-         Worth noting that the series can be switched off from the legend of each chart if a metric is overpowering a chart!<br>"),
+   tagList(HTML("<span class='intro_copy'> This dashboard presents the headline results of the King's Trust Social Returns on Investment (SROI) economic analysis done in collaboration with WPI Economics. <br>
+         The summary tab below gives results aggregated over the ten year period from 2015/16 to 2024/25 split by 5 components. Use the filters to select a sub group of interest.<br>
+         The `Time Series` tab gives results over time. Use the blue buttons on the left to add one of the five components to the chart and also use the filters to select sub-groups of interest.<br>"),
    div(
      style = "text-align: center; margin-top: 10px;",
     download_this(
@@ -459,11 +465,13 @@ server <- function(input, output, session) {
   #selected subgroup value to use in data filter tab2 version
   output$t1_totalbox2 <- renderUI({
     
-    selected <- state2$subgroup 
-    filtered <- df_ten_yr[df_ten_yr$group %in% selected, ] 
+    # data logic
+    selected <- state2$subgroup
+    filtered <- df[df$group %in% selected, ]
+    filtered <- filtered[filtered$`Cohort years` %in% selected_years(), ]
     total <- sum(filtered$`Total savings`, na.rm = TRUE)
     
-    value_box(title = paste0("ADD INTERACTIVE","Social value"), #make the 
+    value_box(title = paste0("Total ","social value over ", number_years_seleted(), " years", " from ",selected_years()[1] , " to ",last(selected_years()) ), #make the 
               #value = custom_number_format(df_ten_yr$`Total savings`[df_ten_yr$group == "-"]), #pipe this in from the data
               value = custom_number_format(total),
               showcase = bs_icon("clipboard-data"),
