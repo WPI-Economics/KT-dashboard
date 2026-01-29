@@ -64,6 +64,14 @@ h1 {
 }
 
 
+
+
+/* Change icon colour inside bslib value boxes */
+.value-box-showcase svg {
+  color: #FFFFFF !important;   /* or any colour you want */
+  fill: currentColor!important;
+}
+
 // Make sidebar + main column equal height
 .bslib-sidebar-layout {
   display: flex !important;
@@ -75,6 +83,18 @@ h1 {
 .bslib-sidebar-layout .main {
   height: auto !important;
   overflow: visible !important;
+}
+
+
+.bslib-value-box .value-box-value {
+  font-size: 2rem!important;
+  justify-content: center;
+  align-content: center!important;
+  align-items: center !important;
+}
+
+.value-box-area {
+  text-align: left !important;
 }
 
 

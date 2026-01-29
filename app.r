@@ -16,7 +16,8 @@ source("datasetup_charts.r")
 my_theme <- bs_theme(version = 5,
                      fg = kt_colors[5],
                      bg = kt_colors[6],
-                     primary = "#005EB8",
+                     primary = "#FFFFFF",
+                     secondary = "#FFFFFF",
                      base_font = "Helvetica") %>% 
   bs_add_rules(
     sass::sass_file("www/styles.scss")
@@ -41,7 +42,7 @@ ui <-
         div(class = "container-md",
             id = "main-header",
             img(src = "logo_left2.svg", id = "main-logo", class = "header-logo"),
-            tags$h1("ECONOMIC VALUE CALCULATOR 2025", id = "main-title"),
+            tags$h1("SOCIAL VALUE DASHBOARD 2026", id = "main-title"),
             img(src = "logo_right.svg", id = "main-logo", class = "header-logo")
         ),
         
@@ -127,6 +128,7 @@ ui <-
                 ) #end card body
               ), #end card
               card_body(
+               
                 layout_column_wrap(
                   width = 1/2,
                   
@@ -134,10 +136,11 @@ ui <-
                   uiOutput("t1_totalbox"),
                   
                   #this one all static so all here
-                  value_box(title = "Social value represents total savings from five dimensions: Economic, Wellbeing, Volunteering, DWP/Health admin, and Reduced re-offending",
+                  value_box( 
+                    title = "Social value represents total savings from five dimensions: Economic, Wellbeing, Volunteering, DWP/Health admin, and Reduced re-offending",
                             value = NULL, #pipe this in from the data
                             showcase = NULL,
-                            theme = "red", 
+                            theme = value_box_theme(bg = kt_colors[1]),
                             fill = TRUE)
                 )),
               
@@ -430,9 +433,9 @@ server <- function(input, output, session) {
   
   #the copy for the umm intro box!
   output$intro_box_copy <- renderUI({
-   tagList(HTML("<span class='intro_copy'> This dashboard presents the headline results of the King's Trust Social Returns on Investment (SROI) economic analysis done in collaboration with WPI Economics. <br>
+   tagList(HTML("<span class='intro_copy'> This dashboard presents the headline results of the King's Trust Social Returns on Investment (SROI) economic analysis undertaken in collaboration with WPI Economics. <br>
          The summary tab below gives results aggregated over the ten year period from 2015/16 to 2024/25 split by 5 components. Use the filters to select a sub group of interest.<br>
-         The `Time Series` tab gives results over time. Use the blue buttons on the left to add one of the five components to the chart and also use the filters to select sub-groups of interest.<br>"),
+         The `Time Series` tab gives results over time. Use the blue buttons on the left in that tab to add one of the five components to the chart and also use the filters to select sub-groups of interest.<br>"),
    div(
      style = "text-align: center; margin-top: 10px;",
     download_this(
@@ -458,7 +461,8 @@ server <- function(input, output, session) {
               #value = custom_number_format(df_ten_yr$`Total savings`[df_ten_yr$group == "-"]), #pipe this in from the data
               value = custom_number_format(total),
               showcase = bs_icon("clipboard-data"),
-              theme = "red", 
+              theme = value_box_theme(bg = kt_colors[1]), 
+              
               fill = TRUE)
   })
   
@@ -475,7 +479,7 @@ server <- function(input, output, session) {
               #value = custom_number_format(df_ten_yr$`Total savings`[df_ten_yr$group == "-"]), #pipe this in from the data
               value = custom_number_format(total),
               showcase = bs_icon("clipboard-data"),
-              theme = "red", 
+              theme = value_box_theme(bg = kt_colors[1]),
               fill = TRUE)
   })
   
@@ -502,9 +506,10 @@ server <- function(input, output, session) {
       class = "value-box-button",
       onclick = "Shiny.setInputValue('select_econ_value', Math.random())",
       value_box(
-        title = paste0("Economic value (",number_years_seleted(), "yr)"),
+        title = paste0("Economic (",number_years_seleted(), "yr)"),
+        showcase = bs_icon("bank", size = "1.5rem"),
         value = custom_number_format(total),
-        height = "6em",
+        height = "7em",
         theme = value_box_theme(bg = kt_colors[2])
       )
     )
@@ -534,10 +539,11 @@ server <- function(input, output, session) {
       class = "value-box-button",
       onclick = "Shiny.setInputValue('select_off_value', Math.random())",
       value_box(
-        title = paste0("Re-offender value (",number_years_seleted(), "yr)"),
+        title = paste0("Re-offending (",number_years_seleted(), "yr)"),
+        showcase = bs_icon("sign-stop", size = "1.5rem"),
         value = custom_number_format(total),
-        height = "6em",
-        theme = value_box_theme(bg = kt_colors[2])  #"yellow"
+        height = "7em",
+        theme = value_box_theme(bg = kt_colors[2])  #"red"
       )
     )
     
@@ -564,9 +570,10 @@ server <- function(input, output, session) {
       class = "value-box-button",
       onclick = "Shiny.setInputValue('select_dwp_value', Math.random())",
       value_box(
-        title = paste0("DWP/health value (",number_years_seleted(), "yr)"),
+        title = paste0("DWP/health (",number_years_seleted(), "yr)"),
+        showcase = bs_icon("pencil", size = "1.5rem"),
         value = custom_number_format(total),
-        height = "6em",
+        height = "7em",
         theme = value_box_theme(bg = kt_colors[2]) #"red"
       )
     )
@@ -595,9 +602,10 @@ server <- function(input, output, session) {
       class = "value-box-button",
       onclick = "Shiny.setInputValue('select_well_value', Math.random())",
       value_box(
-        title = paste0("Wellbeing value (",number_years_seleted(), "yr)"),
+        title = paste0("Wellbeing (",number_years_seleted(), "yr)"),
+        showcase = bs_icon("sun", size = "1.5rem"),
         value = custom_number_format(total),
-        height = "6em",
+        height = "7em",
         theme = value_box_theme(bg = kt_colors[2]) #"white"
       )
     )
@@ -624,9 +632,10 @@ server <- function(input, output, session) {
       class = "value-box-button",
       onclick = "Shiny.setInputValue('select_vol_value', Math.random())",
       value_box(
-        title = paste0("Volunteer value (",number_years_seleted(), "yr)"),
+        title = paste0("Volunteering (",number_years_seleted(), "yr)"),
+        showcase = bs_icon("person-arms-up", size = "1.5rem"),
         value = custom_number_format(total),
-        height = "6em",
+        height = "7em",
         theme = value_box_theme(bg = kt_colors[2]) #"orange"
       )
     )
