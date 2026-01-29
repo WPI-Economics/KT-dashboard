@@ -335,9 +335,9 @@ server <- function(input, output, session) {
   # financial year slider
   
   year_lookup <- df %>% 
-    dplyr::distinct(`Cohort years`) %>% 
-    dplyr::arrange(`Cohort years`) %>% 
-    dplyr::mutate(year_index = dplyr::row_number())
+    distinct(`Cohort years`) %>% 
+    arrange(`Cohort years`) %>% 
+    mutate(year_index = row_number())
   
   selected_years <- reactive({
     req(input$fy_range)
@@ -355,7 +355,7 @@ server <- function(input, output, session) {
   })
   
   
-  
+  number_years_seleted <- reactive({length(selected_years())})
   
 
   # Shared filter state across tabs
@@ -494,7 +494,7 @@ server <- function(input, output, session) {
       class = "value-box-button",
       onclick = "Shiny.setInputValue('select_econ_value', Math.random())",
       value_box(
-        title = "Economic value (10 yr)",
+        title = paste0("Economic value (",number_years_seleted(), "yr)"),
         value = custom_number_format(total),
         height = "6em",
         theme = value_box_theme(bg = kt_colors[2])
@@ -526,7 +526,7 @@ server <- function(input, output, session) {
       class = "value-box-button",
       onclick = "Shiny.setInputValue('select_off_value', Math.random())",
       value_box(
-        title = "Re-offender value (10 yr)",
+        title = paste0("Re-offender value (",number_years_seleted(), "yr)"),
         value = custom_number_format(total),
         height = "6em",
         theme = value_box_theme(bg = kt_colors[2])  #"yellow"
@@ -556,7 +556,7 @@ server <- function(input, output, session) {
       class = "value-box-button",
       onclick = "Shiny.setInputValue('select_dwp_value', Math.random())",
       value_box(
-        title = "DWP/health value (10 yr)",
+        title = paste0("DWP/health value (",number_years_seleted(), "yr)"),
         value = custom_number_format(total),
         height = "6em",
         theme = value_box_theme(bg = kt_colors[2]) #"red"
@@ -587,7 +587,7 @@ server <- function(input, output, session) {
       class = "value-box-button",
       onclick = "Shiny.setInputValue('select_well_value', Math.random())",
       value_box(
-        title = "Wellbeing value (10 yr)",
+        title = paste0("Wellbeing value (",number_years_seleted(), "yr)"),
         value = custom_number_format(total),
         height = "6em",
         theme = value_box_theme(bg = kt_colors[2]) #"white"
@@ -616,7 +616,7 @@ server <- function(input, output, session) {
       class = "value-box-button",
       onclick = "Shiny.setInputValue('select_vol_value', Math.random())",
       value_box(
-        title = "Volunteer value (10 yr)",
+        title = paste0("Volunteer value (",number_years_seleted(), "yr)"),
         value = custom_number_format(total),
         height = "6em",
         theme = value_box_theme(bg = kt_colors[2]) #"orange"
