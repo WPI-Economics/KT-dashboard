@@ -200,7 +200,7 @@ ui <-
                 uiOutput("t1_totalbox2"),
                 
                 # #time filter
-                 sliderTextInput("fy-range",
+                 sliderTextInput("fy_range",
                  "",
                  choices = unique(df$`Cohort years`),
                  selected = c(fy_levels[1], fy_levels[length(fy_levels)]),
@@ -331,37 +331,33 @@ server <- function(input, output, session) {
   ################# filter stuff tab2
   #################
   
-  # Shared filter state across tabs
-  # state2 <- reactiveValues(
-  #   parent = NULL,
-  #   subgroup = NULL
-  # )
-  # 
-  # # Tab 1: when filter1 changes
-  # observeEvent(input$filter3, {
-  #   state2$parent <- input$filter3
-  #   
-  #   if (is.null(input$filter3) || input$filter3 == "") {
-  #     # Clear everything when parent is empty 
-  #     session$sendCustomMessage("resetSelectize", "filter4")
-  #     updateSelectizeInput(session, "filter4", choices = NULL, server = TRUE)
-  #     state2$subgroup <- NULL
-  #     return()
-  #   }
-  #   
-  #   subset_choices2 <- unique(df$group[df$group_type == input$filter3])
-  #   
-  #   # Clear everything when parent is empty 
-  #   session$sendCustomMessage("resetSelectize", "filter4")
-  #   updateSelectizeInput(
-  #     session, "filter4",
-  #     choices  = subset_choices2,
-  #     selected = subset_choices2[1],
-  #     server   = TRUE
-  #   )
-  #   
-  #   state2$subgroup <- subset_choices2[1]
   
+  # financial year slider
+  
+  year_lookup <- df %>% 
+    dplyr::distinct(`Cohort years`) %>% 
+    dplyr::arrange(`Cohort years`) %>% 
+    dplyr::mutate(year_index = dplyr::row_number())
+  
+  selected_years <- reactive({
+    req(input$fy_range)
+    
+    # make sure we’re comparing characters
+    endpoints <- as.character(input$fy_range)
+    
+    idx <- year_lookup$year_index[year_lookup$`Cohort years` %in% endpoints]
+    
+    idx_min <- min(idx)
+    idx_max <- max(idx)
+    
+    year_lookup$`Cohort years`[year_lookup$year_index >= idx_min &
+                                 year_lookup$year_index <= idx_max]
+  })
+  
+  
+  
+  
+
   # Shared filter state across tabs
   state2 <- reactiveValues(
     parent = NULL,
@@ -480,13 +476,18 @@ server <- function(input, output, session) {
   ###############
   
   
-  
   output$t2_sidebox1 <- renderUI({
+    
+    req(state2$subgroup)
+    req(selected_years())
+    
     # data logic
     selected <- state2$subgroup
-    filtered <- df_ten_yr[df_ten_yr$group %in% selected, ]
+    filtered <- df[df$group %in% selected, ]
+    filtered <- filtered[filtered$`Cohort years` %in% selected_years(), ]
     total <- sum(filtered$`Economic value (GVA)`, na.rm = TRUE)
     
+
     # build the UI
     ui <- tags$div(
       id = "select_econ_value_box",
@@ -516,7 +517,8 @@ server <- function(input, output, session) {
   output$t2_sidebox2 <- renderUI({
     #the data logic
     selected <- state2$subgroup
-    filtered <- df_ten_yr[df_ten_yr$group %in% selected, ]
+    filtered <- df[df$group %in% selected, ]
+    filtered <- filtered[filtered$`Cohort years` %in% selected_years(), ]
     total <- sum(filtered$"Reduced re-offending", na.rm = TRUE)
     #the box
     ui <- tags$div(
@@ -545,7 +547,8 @@ server <- function(input, output, session) {
   output$t2_sidebox3 <- renderUI({
     #the data logic
     selected <- state2$subgroup
-    filtered <- df_ten_yr[df_ten_yr$group %in% selected, ]
+    filtered <- df[df$group %in% selected, ]
+    filtered <- filtered[filtered$`Cohort years` %in% selected_years(), ]
     total <- sum(filtered$"DWP/health admin", na.rm = TRUE)
     #the box
     ui <- tags$div(
@@ -575,7 +578,8 @@ server <- function(input, output, session) {
   output$t2_sidebox4 <- renderUI({
     #the data logic
     selected <- state2$subgroup
-    filtered <- df_ten_yr[df_ten_yr$group %in% selected, ]
+    filtered <- df[df$group %in% selected, ]
+    filtered <- filtered[filtered$`Cohort years` %in% selected_years(), ]
     total <- sum(filtered$"Wellbeing", na.rm = TRUE)
     #the box
     ui <- tags$div(
@@ -603,7 +607,8 @@ server <- function(input, output, session) {
   output$t2_sidebox5 <- renderUI({
     #the data logic
     selected <- state2$subgroup
-    filtered <- df_ten_yr[df_ten_yr$group %in% selected, ]
+    filtered <- df[df$group %in% selected, ]
+    filtered <- filtered[filtered$`Cohort years` %in% selected_years(), ]
     total <- sum(filtered$"Volunteer value", na.rm = TRUE)
     #the box
     ui <- tags$div(
@@ -700,6 +705,7 @@ server <- function(input, output, session) {
       select(-c(`Cohort count`,`Total savings`)) %>% 
       filter(group == input$filter2, # <<<< INTERACTIVE INPUT HERE
              
+             
       ) %>% 
       pivot_longer(
         cols = 3:ncol(.),
@@ -707,6 +713,7 @@ server <- function(input, output, session) {
         names_to = "names"
       ) %>% 
       arrange(match(`names`, df_total$names)) 
+    
   })
   
   data_highchart1_comparison <- reactive({
@@ -844,6 +851,7 @@ server <- function(input, output, session) {
     #set up the df to feed the chart. This will change depending on user inputs
     df %>% 
       filter(group == input$filter4) %>%  # <<<< INTERACTIVE INPUT HERE
+      filter(`Cohort years` %in% selected_years()) %>% 
       select(c(`Cohort years`, group, group_type, `Cohort count`, selected_column = all_of(selected_metric())))
   })
   
@@ -852,6 +860,7 @@ server <- function(input, output, session) {
     #set up the df to feed the chart. This will change depending on user inputs
     df %>% 
       filter(group == input$filter4b) %>%  # <<<< INTERACTIVE INPUT HERE
+      filter(`Cohort years` %in% selected_years()) %>% 
       select(c(`Cohort years`, group, group_type, `Cohort count`, selected_column = all_of(selected_metric())))
   })
   
@@ -860,6 +869,7 @@ server <- function(input, output, session) {
     #set up the df to feed the chart. This will change depending on user inputs
     df %>% 
       filter(group == input$filter4) %>%  # <<<< INTERACTIVE INPUT HERE
+      filter(`Cohort years` %in% selected_years()) %>% 
       select(c(`Cohort years`, group, group_type, `Cohort count`, `Total savings`))
   })
   
@@ -868,6 +878,7 @@ server <- function(input, output, session) {
     #set up the df to feed the chart. This will change depending on user inputs
     df %>% 
       filter(group == input$filter4b) %>%  # <<<< INTERACTIVE INPUT HERE
+      filter(`Cohort years` %in% selected_years()) %>% 
       select(c(`Cohort years`, group, group_type, `Cohort count`, `Total savings`))
   })
   
@@ -970,7 +981,7 @@ server <- function(input, output, session) {
                               fontFamily = "Arial", fontWeight = "400" )) %>% 
         hc_exporting(enabled = F) %>% 
         
-        hc_xAxis(categories = df_all$`Cohort years`, #substitute this for the selected interactive filter input
+        hc_xAxis(categories = data_highchart_aspect_sub()$`Cohort years`, #substitute this for the selected interactive filter input
                  title = list(text = "")) %>% 
         hc_yAxis(#title = list(text = "£"),
           labels = list(
