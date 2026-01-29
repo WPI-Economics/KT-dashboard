@@ -5,6 +5,8 @@ library(highcharter)
 library(bslib)
 library(bsicons)
 library(sass)
+library(downloadthis)
+library(shinyWidgets)
 
 
 #read in data, colours and highchart chart
@@ -114,7 +116,7 @@ ui <-
                                      persist = FALSE, 
                                      create = FALSE )),
                     
-                    selectizeInput("filter2b", "Comparison", 
+                    selectizeInput("filter2b", "Comparison (chart only)", 
                                    choices = NULL, 
                                    options = list( 
                                      persist = FALSE, 
@@ -132,7 +134,7 @@ ui <-
                   uiOutput("t1_totalbox"),
                   
                   #this one all static so all here
-                  value_box(title = "Social value represents the sum total of the savings over ten years from five dimensions measured: Economic, Wellbeing, Volunteering, DWP/Health admin, and Reduced re-offending",
+                  value_box(title = "Social value represents total savings from five dimensions: Economic, Wellbeing, Volunteering, DWP/Health admin, and Reduced re-offending",
                             value = NULL, #pipe this in from the data
                             showcase = NULL,
                             theme = "red", 
@@ -148,7 +150,7 @@ ui <-
             #)
           ),
           
-          # ---- TAB Time Series ----
+          # ---- TAB 2Time Series ----
           nav_panel(
             "Time Series",
             layout_sidebar(
@@ -172,7 +174,7 @@ ui <-
                 card(
                   class = "filter-card",
                   card_body(
-                    style = "height: 90px;",
+                    style = "height: 80px;",
                     layout_column_wrap(
                       width = 1/3,
                       selectizeInput("filter3", "Group", choices = unique(df$group_type), 
@@ -183,7 +185,7 @@ ui <-
                                      options = list(
                                        persist = FALSE, create = FALSE )) ,
                       
-                      selectizeInput("filter4b", "Comparison", 
+                      selectizeInput("filter4b", "Comparison (chart only)", 
                                      choices = NULL, 
                                      options = list( 
                                        persist = FALSE, 
@@ -195,11 +197,25 @@ ui <-
                 ),
                 
                 #red total box
-                uiOutput("t1_totalbox2"),
+                div(
+                  class = "sv-summary-row", 
+                  uiOutput("t1_totalbox2")
+                ),
+                
+                # #time filter
+                div(
+                  class = "fy-slider-row",
+                 sliderTextInput("fy_range",
+                 "",
+                 choices = unique(df$`Cohort years`),
+                 selected = c(fy_levels[1], fy_levels[length(fy_levels)]),
+                 grid = FALSE,
+                 width = "100%"),
                 
                 card(fill = FALSE,
                      #card_header("Title"),
                      highchartOutput("highchart_plot2")
+                     )
                 )
               )
             )
@@ -322,37 +338,33 @@ server <- function(input, output, session) {
   ################# filter stuff tab2
   #################
   
-  # Shared filter state across tabs
-  # state2 <- reactiveValues(
-  #   parent = NULL,
-  #   subgroup = NULL
-  # )
-  # 
-  # # Tab 1: when filter1 changes
-  # observeEvent(input$filter3, {
-  #   state2$parent <- input$filter3
-  #   
-  #   if (is.null(input$filter3) || input$filter3 == "") {
-  #     # Clear everything when parent is empty 
-  #     session$sendCustomMessage("resetSelectize", "filter4")
-  #     updateSelectizeInput(session, "filter4", choices = NULL, server = TRUE)
-  #     state2$subgroup <- NULL
-  #     return()
-  #   }
-  #   
-  #   subset_choices2 <- unique(df$group[df$group_type == input$filter3])
-  #   
-  #   # Clear everything when parent is empty 
-  #   session$sendCustomMessage("resetSelectize", "filter4")
-  #   updateSelectizeInput(
-  #     session, "filter4",
-  #     choices  = subset_choices2,
-  #     selected = subset_choices2[1],
-  #     server   = TRUE
-  #   )
-  #   
-  #   state2$subgroup <- subset_choices2[1]
   
+  # financial year slider
+  
+  year_lookup <- df %>% 
+    distinct(`Cohort years`) %>% 
+    arrange(`Cohort years`) %>% 
+    mutate(year_index = row_number())
+  
+  selected_years <- reactive({
+    req(input$fy_range)
+    
+    # make sure we’re comparing characters
+    endpoints <- as.character(input$fy_range)
+    
+    idx <- year_lookup$year_index[year_lookup$`Cohort years` %in% endpoints]
+    
+    idx_min <- min(idx)
+    idx_max <- max(idx)
+    
+    year_lookup$`Cohort years`[year_lookup$year_index >= idx_min &
+                                 year_lookup$year_index <= idx_max]
+  })
+  
+  
+  number_years_seleted <- reactive({length(selected_years())})
+  
+
   # Shared filter state across tabs
   state2 <- reactiveValues(
     parent = NULL,
@@ -418,14 +430,22 @@ server <- function(input, output, session) {
   
   #the copy for the umm intro box!
   output$intro_box_copy <- renderUI({
-    HTML("<span class='intro_copy'> This dashboard presents the headline results of the King's Trust Social Returns on Investment (SROI) economic analysis done in collaboration with WPI Economics. <br><br>
-         The summary tab below gives results aggregated over the ten year period from 2015/16 to 2024/25 split by 5 components. Use the filters to select a sub group of interest.<br><br>
-         The `Time Series` tab gives results over time. Use the blue buttons on the left to add one of the five components to the chart and also use the filters to select sub-groups of interest.<br><br>
-         Worth noting that the series can be switched off from the legend of each chart if a metric is overpowering a chart!
-         
-         
-         ")
+   tagList(HTML("<span class='intro_copy'> This dashboard presents the headline results of the King's Trust Social Returns on Investment (SROI) economic analysis done in collaboration with WPI Economics. <br>
+         The summary tab below gives results aggregated over the ten year period from 2015/16 to 2024/25 split by 5 components. Use the filters to select a sub group of interest.<br>
+         The `Time Series` tab gives results over time. Use the blue buttons on the left to add one of the five components to the chart and also use the filters to select sub-groups of interest.<br>"),
+   div(
+     style = "text-align: center; margin-top: 10px;",
+    download_this(
+      .data = df,
+      output_name = "sroi_data", 
+      output_extension = ".xlsx", 
+      button_label = "Download data", 
+      button_type = "default"
+    ))
+    )
   })
+  
+  
   
   #selected subgroup value to use in data filter
   output$t1_totalbox <- renderUI({
@@ -445,11 +465,13 @@ server <- function(input, output, session) {
   #selected subgroup value to use in data filter tab2 version
   output$t1_totalbox2 <- renderUI({
     
-    selected <- state2$subgroup 
-    filtered <- df_ten_yr[df_ten_yr$group %in% selected, ] 
+    # data logic
+    selected <- state2$subgroup
+    filtered <- df[df$group %in% selected, ]
+    filtered <- filtered[filtered$`Cohort years` %in% selected_years(), ]
     total <- sum(filtered$`Total savings`, na.rm = TRUE)
     
-    value_box(title = "10 year Total Social Return on Investment",
+    value_box(title = paste0("Total ","social value over ", number_years_seleted(), " years", " from ",selected_years()[1] , " to ",last(selected_years()) ), #make the 
               #value = custom_number_format(df_ten_yr$`Total savings`[df_ten_yr$group == "-"]), #pipe this in from the data
               value = custom_number_format(total),
               showcase = bs_icon("clipboard-data"),
@@ -462,20 +484,25 @@ server <- function(input, output, session) {
   ###############
   
   
-  
   output$t2_sidebox1 <- renderUI({
+    
+    req(state2$subgroup)
+    req(selected_years())
+    
     # data logic
     selected <- state2$subgroup
-    filtered <- df_ten_yr[df_ten_yr$group %in% selected, ]
+    filtered <- df[df$group %in% selected, ]
+    filtered <- filtered[filtered$`Cohort years` %in% selected_years(), ]
     total <- sum(filtered$`Economic value (GVA)`, na.rm = TRUE)
     
+
     # build the UI
     ui <- tags$div(
       id = "select_econ_value_box",
       class = "value-box-button",
       onclick = "Shiny.setInputValue('select_econ_value', Math.random())",
       value_box(
-        title = "Economic value (10 yr)",
+        title = paste0("Economic value (",number_years_seleted(), "yr)"),
         value = custom_number_format(total),
         height = "6em",
         theme = value_box_theme(bg = kt_colors[2])
@@ -498,7 +525,8 @@ server <- function(input, output, session) {
   output$t2_sidebox2 <- renderUI({
     #the data logic
     selected <- state2$subgroup
-    filtered <- df_ten_yr[df_ten_yr$group %in% selected, ]
+    filtered <- df[df$group %in% selected, ]
+    filtered <- filtered[filtered$`Cohort years` %in% selected_years(), ]
     total <- sum(filtered$"Reduced re-offending", na.rm = TRUE)
     #the box
     ui <- tags$div(
@@ -506,7 +534,7 @@ server <- function(input, output, session) {
       class = "value-box-button",
       onclick = "Shiny.setInputValue('select_off_value', Math.random())",
       value_box(
-        title = "Re-offender value (10 yr)",
+        title = paste0("Re-offender value (",number_years_seleted(), "yr)"),
         value = custom_number_format(total),
         height = "6em",
         theme = value_box_theme(bg = kt_colors[2])  #"yellow"
@@ -527,7 +555,8 @@ server <- function(input, output, session) {
   output$t2_sidebox3 <- renderUI({
     #the data logic
     selected <- state2$subgroup
-    filtered <- df_ten_yr[df_ten_yr$group %in% selected, ]
+    filtered <- df[df$group %in% selected, ]
+    filtered <- filtered[filtered$`Cohort years` %in% selected_years(), ]
     total <- sum(filtered$"DWP/health admin", na.rm = TRUE)
     #the box
     ui <- tags$div(
@@ -535,7 +564,7 @@ server <- function(input, output, session) {
       class = "value-box-button",
       onclick = "Shiny.setInputValue('select_dwp_value', Math.random())",
       value_box(
-        title = "DWP/health value (10 yr)",
+        title = paste0("DWP/health value (",number_years_seleted(), "yr)"),
         value = custom_number_format(total),
         height = "6em",
         theme = value_box_theme(bg = kt_colors[2]) #"red"
@@ -557,7 +586,8 @@ server <- function(input, output, session) {
   output$t2_sidebox4 <- renderUI({
     #the data logic
     selected <- state2$subgroup
-    filtered <- df_ten_yr[df_ten_yr$group %in% selected, ]
+    filtered <- df[df$group %in% selected, ]
+    filtered <- filtered[filtered$`Cohort years` %in% selected_years(), ]
     total <- sum(filtered$"Wellbeing", na.rm = TRUE)
     #the box
     ui <- tags$div(
@@ -565,7 +595,7 @@ server <- function(input, output, session) {
       class = "value-box-button",
       onclick = "Shiny.setInputValue('select_well_value', Math.random())",
       value_box(
-        title = "Wellbeing value (10 yr)",
+        title = paste0("Wellbeing value (",number_years_seleted(), "yr)"),
         value = custom_number_format(total),
         height = "6em",
         theme = value_box_theme(bg = kt_colors[2]) #"white"
@@ -585,7 +615,8 @@ server <- function(input, output, session) {
   output$t2_sidebox5 <- renderUI({
     #the data logic
     selected <- state2$subgroup
-    filtered <- df_ten_yr[df_ten_yr$group %in% selected, ]
+    filtered <- df[df$group %in% selected, ]
+    filtered <- filtered[filtered$`Cohort years` %in% selected_years(), ]
     total <- sum(filtered$"Volunteer value", na.rm = TRUE)
     #the box
     ui <- tags$div(
@@ -593,7 +624,7 @@ server <- function(input, output, session) {
       class = "value-box-button",
       onclick = "Shiny.setInputValue('select_vol_value', Math.random())",
       value_box(
-        title = "Volunteer value (10 yr)",
+        title = paste0("Volunteer value (",number_years_seleted(), "yr)"),
         value = custom_number_format(total),
         height = "6em",
         theme = value_box_theme(bg = kt_colors[2]) #"orange"
@@ -682,6 +713,7 @@ server <- function(input, output, session) {
       select(-c(`Cohort count`,`Total savings`)) %>% 
       filter(group == input$filter2, # <<<< INTERACTIVE INPUT HERE
              
+             
       ) %>% 
       pivot_longer(
         cols = 3:ncol(.),
@@ -689,6 +721,7 @@ server <- function(input, output, session) {
         names_to = "names"
       ) %>% 
       arrange(match(`names`, df_total$names)) 
+    
   })
   
   data_highchart1_comparison <- reactive({
@@ -783,7 +816,11 @@ server <- function(input, output, session) {
           useHTML = TRUE, 
           formatter = JS(" function() { return '£' + Highcharts.numberFormat(this.y / 1e6, 0, '.', ',') + 'M</b>'; } ") 
         ) %>% 
-        hc_add_theme(kt_theme)
+        hc_add_theme(kt_theme) %>% 
+        hc_exporting(enabled = TRUE,
+                     buttons = list(
+                       contextButton = list(
+                         menuItems = c("downloadSVG","downloadPNG", "downloadXLS"))))
       
       
       
@@ -822,6 +859,7 @@ server <- function(input, output, session) {
     #set up the df to feed the chart. This will change depending on user inputs
     df %>% 
       filter(group == input$filter4) %>%  # <<<< INTERACTIVE INPUT HERE
+      filter(`Cohort years` %in% selected_years()) %>% 
       select(c(`Cohort years`, group, group_type, `Cohort count`, selected_column = all_of(selected_metric())))
   })
   
@@ -830,6 +868,7 @@ server <- function(input, output, session) {
     #set up the df to feed the chart. This will change depending on user inputs
     df %>% 
       filter(group == input$filter4b) %>%  # <<<< INTERACTIVE INPUT HERE
+      filter(`Cohort years` %in% selected_years()) %>% 
       select(c(`Cohort years`, group, group_type, `Cohort count`, selected_column = all_of(selected_metric())))
   })
   
@@ -838,6 +877,7 @@ server <- function(input, output, session) {
     #set up the df to feed the chart. This will change depending on user inputs
     df %>% 
       filter(group == input$filter4) %>%  # <<<< INTERACTIVE INPUT HERE
+      filter(`Cohort years` %in% selected_years()) %>% 
       select(c(`Cohort years`, group, group_type, `Cohort count`, `Total savings`))
   })
   
@@ -846,6 +886,7 @@ server <- function(input, output, session) {
     #set up the df to feed the chart. This will change depending on user inputs
     df %>% 
       filter(group == input$filter4b) %>%  # <<<< INTERACTIVE INPUT HERE
+      filter(`Cohort years` %in% selected_years()) %>% 
       select(c(`Cohort years`, group, group_type, `Cohort count`, `Total savings`))
   })
   
@@ -948,7 +989,7 @@ server <- function(input, output, session) {
                               fontFamily = "Arial", fontWeight = "400" )) %>% 
         hc_exporting(enabled = F) %>% 
         
-        hc_xAxis(categories = df_all$`Cohort years`, #substitute this for the selected interactive filter input
+        hc_xAxis(categories = data_highchart_aspect_sub()$`Cohort years`, #substitute this for the selected interactive filter input
                  title = list(text = "")) %>% 
         hc_yAxis(#title = list(text = "£"),
           labels = list(
@@ -963,7 +1004,11 @@ server <- function(input, output, session) {
           useHTML = TRUE, 
           formatter = JS(" function() { return '£' + Highcharts.numberFormat(this.y / 1e6, 0, '.', ',') + 'M</b>'; } ") 
         ) %>% 
-        hc_add_theme(kt_theme) 
+        hc_add_theme(kt_theme) %>% 
+        hc_exporting(enabled = TRUE,
+                     buttons = list(
+                       contextButton = list(
+                         menuItems = c("downloadSVG","downloadPNG", "downloadXLS"))))
       
       
       

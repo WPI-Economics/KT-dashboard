@@ -70,8 +70,8 @@ df <- read_csv("db_data.csv") %>%
          "Wellbeing" = `WELLBY (-dw and attribution) (£)`,
          "Total savings" = `Total savings (£)`
          ) %>% 
-  mutate(
-    "Volunteer value" = `Volunteers (-attribution) (£)` + `Volunteer value (mentor and non-mentor) (£)`,
+  mutate( `Volunteer value` = rowSums( across(c(`Volunteers (-attribution) (£)`, `Volunteer value (mentor and non-mentor) (£)`)), 
+                                       na.rm = TRUE ),
     "Dummy" = NA,
     "group" = case_when(
       group == "all"~ "-",
@@ -90,11 +90,13 @@ df <- read_csv("db_data.csv") %>%
                                "2021/22", 
                                "2022/23", 
                                "2023/24", 
-                               "2024/25")) %>% filter(!is.na(group)) 
+                               "2024/25")) %>% filter(!is.na(group)) %>% unique()
   #0dp rounding
 numeric_cols <- colnames(df[sapply(df, is.numeric)]) #identify numeric columns
 df[numeric_cols] <- sapply(df[numeric_cols], function(x){round(x,0)})
 
+#stash the years in a vector
+fy_levels <- unique(df$`Cohort years`)
 
 #subset the total/all group for a constant series in the chart
 df_all <- df %>% filter(group == "-") #%>% na.omit()

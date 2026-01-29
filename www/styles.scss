@@ -53,6 +53,30 @@ h1 {
   color: white;
 }
 
+.center-download { 
+  text-align: center; 
+  margin-top: 15px; }
+
+.btn-default {
+  color: white;
+  border-color: white;
+  align-items: center;
+}
+
+
+// Make sidebar + main column equal height
+.bslib-sidebar-layout {
+  display: flex !important;
+  align-items: stretch !important;
+}
+
+// Ensure both columns grow naturally
+.bslib-sidebar-layout .sidebar,
+.bslib-sidebar-layout .main {
+  height: auto !important;
+  overflow: visible !important;
+}
+
 
 /* Outer navbar */
 .navbar.navbar-default{
@@ -83,6 +107,101 @@ h1 {
 }
 
 
+/* the flipping range slider is HORRIBLE to style */
+/* Apply to your slider container class */
+.form-group .irs--shiny .irs-bar {
+  background-color: #1E1964 !important;
+  margin-top: 0px;
+  margin-bottom: 0px;
+}
+
+/* Handles */
+.form-group .irs--shiny .irs-handle {
+  background-color: #28D796 !important;
+  border-color: #28D796 !important;
+}
+
+/* Label bubbles */
+.form-group .irs--shiny .irs-from,
+.form-group .irs--shiny .irs-to,
+.form-group .irs--shiny .irs-single {
+  background-color: #1E1964 !important;
+  color: #fff !important;
+}
+
+/* Min/max labels */
+.form-group .irs--shiny .irs-min,
+.form-group .irs--shiny .irs-max {
+  color: #1E1964 !important;
+}
+
+.irs.irs--shiny {
+  margin-top: 1px;
+  margin-bottom: 1px;
+}
+
+
+// Remove forced vertical fill from grid items
+/* Collapse top and bottom spacing around the slider */
+.fy-slider-row {
+  margin-top: 0 !important;
+  padding-top: 0 !important;
+  margin-bottom: 0.25rem !important;
+  padding-bottom: 0 !important;
+}
+
+/* Remove spacing inside the slider container */
+/* Collapse top padding of the sidebar container */
+.bslib-sidebar-layout .sidebar {
+  padding-top: 0.25rem !important;
+  margin-top: 0 !important;
+}
+
+/* Collapse top margin of the slider row */
+.fy-slider-row {
+  margin-top: 0 !important;
+  padding-top: 0 !important;
+}
+
+/* Collapse top margin of the slider container */
+.fy-slider-row .bslib-input-container.slider-text {
+  margin-top: 0 !important;
+  padding-top: 0 !important;
+}
+
+/* Optional: tighten label spacing */
+.fy-slider-row .bslib-input-container.slider-text label {
+  margin-top: 0 !important;
+  padding-top: 0 !important;
+}
+
+
+/* Kill spacing on the grid item that wraps the red summary box */
+/* Remove the vertical gap under the red summary box */
+/* Nuclear option: collapse spacing on the grid item that contains the summary box */
+/* In the sidebar, kill the bottom margin under the FIRST grid item (your red box) */
+/* Generic override for that layout */
+.bslib-grid.bslib-mb-spacing > .bslib-grid-item:first-child {
+  margin-bottom: 0 !important;
+}
+
+.sv-summary-row {
+  margin-top: 1px !important;
+  margin-bottom: 1px !important;
+}
+
+/* Remove top spacing from the FIRST grid item in the sidebar */
+.bslib-sidebar-layout .sidebar .bslib-grid.bslib-mb-spacing > .bslib-grid-item:first-child {
+  margin-top: 0 !important;
+  padding-top: 0 !important;
+}
+
+/* Remove top spacing from ANY grid item that contains your summary row */
+.bslib-grid-item:has(.sv-summary-row) {
+  margin-top: 0 !important;
+  padding-top: 0 !important;
+}
+
 
 /**/
 /* specific interactives*/
@@ -104,6 +223,25 @@ h1 {
   min-width: 100% !important;   /* at least as wide as the input */
   max-width: none !important;   /* allow expansion for long items */
 }
+
+/* Change the border + glow when the selectize input is focused */
+.selectize-control.single .selectize-input.focus {
+  border-color: #28D796 !important;
+  box-shadow: 0 0 0 2px rgba(20, 140, 110, 0.35) !important;
+}
+
+/* Also change the highlight when hovering/selecting items in the dropdown */
+.selectize-dropdown .active {
+  background-color: #28D796 !important;
+  color: white !important;
+}
+
+/* Change background of selected item in dropdown */
+.selectize-dropdown .selected {
+  background-color: #28D796 !important;
+  color: white !important;
+}
+
 
 
 // Ensure selectize dropdown stays inside its container
