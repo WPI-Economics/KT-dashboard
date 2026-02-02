@@ -231,13 +231,15 @@ ui <-
             "Glossary",
             card(
               card_header("Glossary"),
-              card_body(HTML("<h3>Social value:</h3><p>This is the sum of the savings across the various dimensions</p><br>
-                    <h3>Economic value:</h3><p>description here</p><br>
-                    <h3>Wellbeing:</h3><p>description here</p><br>
-                    <h3>Volunteer value:</h3><p>description here</p><br>
-                    <h3>DWP/Health admin:</h3><p>description here</p><br>
-                    <h3>Reduced re-offending:</h3><p>description here</p><br>
-                    "))
+              card_body(HTML("<h3>Social Value</h4><p>This is the sum of the savings across the five dimensions (Economic, Wellbeing, Volunteering, reduced re-offending and savings to DWP/health admin.</p><br>
+                    <h3>Economic value</h4><p><b>Gross Value Added (GVA) to the economy.</b><br> This is derived from employment and salaries outcomes modelled from KT outcomes data using a factor multiplier to convert salaries into Gross Value Added. This is adjusted for deadweight (i.e. what would have happened anyway without KT input), adjusted for inflation (CPIH) so all years are comparable, and also adjusted for displacement and attribution. This measure is only applicable to those aged 18+</p><br>
+                    <h3>Wellbeing</h4><p><b>The economic £ value of improvments to the wellbeing of KT participants.</b><br> This is modelled from KT Health and Social Care and My Journey data. Wellbeing change is converted into economic £ values via the HM treasury guidance on valuation of Wellbeing-adjusted life years (WELLBY), and are adjusted for attribution. The results apply to all ages (including under 18s)</p><br>
+                    <h3>Volunteer value</h4><p><b>The economic value of volunteering.</b><br> This sums together value derived from KT participants volunteering activity, and volunteers and mentors that help KT participants. Volunteering counts in the KT data are too low to support regression modelling, so we calculate an overall value using living wage for 13 hours per week for three months. External volunteers are valued at 48 hours per year with £25 per hour for mentors and Living Wage for others.</p><br>
+                    <h3>DWP/Health admin</h4><p><b>The savings to the exchequer of reducing admin for DWP and health serivices.</b><br> These apply fixed saving values for ESA and JSA taken from Greater Manchester Combined Authority Cost Benefit Analysis (CBA) model and apply it to those that have gained employment in our modelling</p><br>
+                    <h3>Reduced re-offending</h4><p><b>The savings to the economy from reduced re-offending.</b><br> For KT participants with an offending background, this meausure estimates the change in the number of offences seperately for males and females from KT programme participation and converts into £ value to the econcomy using the GMCA unit cost data for offences.</p><br>
+                    
+                    For further details of methods and sources please see the SROI technical report.
+                             "))
             )
           ),
           
