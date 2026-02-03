@@ -249,17 +249,21 @@ ui <-
             card(
               card_header("Data Sources"),
               card_body(HTML("<h3>Kings Trust Sources:</h3>
-                             <p><b>Partipants</B> extracted xx/xx/xx, covering 2015/16 to 2024/25</p>
-                             <p><b>Outcomes</B> extracted xx/xx/xx, covering 2015/16 to 2024/25</p>
-                             <p><b>My Journey</B> extracted xx/xx/xx, covering 2015/16 to 2024/25</p>
-                             <p><b>Health and Social care outcomes</B> extracted xx/xx/xx, covering 2015/16 to 2024/25</p>
-                             <p><b>Volunteers</B> extracted xx/xx/xx, covering 2015/16 to 2024/25</p>
-                             
+                             <p><b>Partipants</B> extracted 22-08-2025, covering 01-04-2019 to 31-03-2025</p>
+                             <p><b>Outcomes Survey</B> extracted 10-07-2025, covering 20-01-2022 to 16-05-2025</p>
+                             <p><b>HCS Outcomes</B> extracted 20-05-2025, covering 02-10-2023 to 19-05-2025</p>
+                             <p><b>My Journey</B> extracted 20-05-2025, covering 01-04-2019 to 30-04-2025</p>
+                             <p><b>Wellbeing Survey HSC data</B> extracted 24-06-2025, covering 01-04-2024 to 24-06-2025</p>
+                             <p><b>The Prince's Trust Wellbeing Survey</B> extracted 27-05-2025, 01-03-2023</p>
+                             <p><b>Health and Social care outcomes</B> extracted 20-05-2025, covering 02-10-2023 to 19-05-2025</p>
+                             <p><b>Volunteer data</B> extracted 10-06-2025, as at 19-06-2025</p>
+                             <p><b>Number of Volunteers Supporting Young People</B> extracted 25-06-2025, 2018-2024</p>
                              <h3>External sources</h3>
                              <p><b>Annual Population Survey, ONS</b> Used for deadweight calculations
                              <p><b>Labour productivity (GVA), ONS</b> Used for GVA calculations
                              <p><b>Wellbeing, ONS</b> Used for deadweight calculations
                              <p><b>Consumer prices index (housing), ONS</b> Used for deflators
+                             <p><b>CBA Unit Costs Database, Greater Manchester Combined Authority</b> Used for unit costs of offending and DWP/health admin savings
                              "))
             )
           )
