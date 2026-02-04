@@ -160,10 +160,10 @@ ui <-
               sidebar = sidebar(
                 
                 uiOutput("t2_sidebox1"),
-                uiOutput("t2_sidebox2"),
-                uiOutput("t2_sidebox3"),
                 uiOutput("t2_sidebox4"),
-                uiOutput("t2_sidebox5")
+                uiOutput("t2_sidebox5"),
+                uiOutput("t2_sidebox3"),
+                uiOutput("t2_sidebox2")
               ),
               
               
@@ -441,7 +441,7 @@ server <- function(input, output, session) {
   output$intro_box_copy <- renderUI({
    tagList(HTML("<span class='intro_copy'> This dashboard presents the headline results of the King's Trust Social Returns on Investment (SROI) economic analysis undertaken in collaboration with WPI Economics. <br>
          The summary tab below gives results aggregated over the ten year period from 2015/16 to 2024/25 split by 5 components. Use the filters to select a sub group of interest.<br>
-         The `Time Series` tab gives results over time. Use the blue buttons on the left in that tab to add one of the five components to the chart and also use the filters to select sub-groups of interest.<br>"),
+         The `Time Series` tab gives results over time. Use the blue buttons on the left in that tab to add one of the five components to the chart and also use the filters to select sub-groups of interest, and the year slider to select a range of years.<br>"),
    div(
      style = "text-align: center; margin-top: 10px;",
     download_this(
@@ -513,7 +513,7 @@ server <- function(input, output, session) {
       onclick = "Shiny.setInputValue('select_econ_value', Math.random())",
       value_box(
         title = paste0("Economic (",number_years_seleted(), "yr)"),
-        showcase = bs_icon("bank", size = "1.5rem"),
+        #showcase = bs_icon("bank", size = "1.5rem"),
         value = custom_number_format(total),
         height = "7em",
         theme = value_box_theme(bg = kt_colors[2])
@@ -546,7 +546,7 @@ server <- function(input, output, session) {
       onclick = "Shiny.setInputValue('select_off_value', Math.random())",
       value_box(
         title = paste0("Re-offending (",number_years_seleted(), "yr)"),
-        showcase = bs_icon("sign-stop", size = "1.5rem"),
+        #showcase = bs_icon("sign-stop", size = "1.5rem"),
         value = custom_number_format(total),
         height = "7em",
         theme = value_box_theme(bg = kt_colors[2])  #"red"
@@ -577,7 +577,7 @@ server <- function(input, output, session) {
       onclick = "Shiny.setInputValue('select_dwp_value', Math.random())",
       value_box(
         title = paste0("DWP/health (",number_years_seleted(), "yr)"),
-        showcase = bs_icon("pencil", size = "1.5rem"),
+        #showcase = bs_icon("pencil", size = "1.5rem"),
         value = custom_number_format(total),
         height = "7em",
         theme = value_box_theme(bg = kt_colors[2]) #"red"
@@ -609,7 +609,7 @@ server <- function(input, output, session) {
       onclick = "Shiny.setInputValue('select_well_value', Math.random())",
       value_box(
         title = paste0("Wellbeing (",number_years_seleted(), "yr)"),
-        showcase = bs_icon("sun", size = "1.5rem"),
+        #showcase = bs_icon("sun", size = "1.5rem"),
         value = custom_number_format(total),
         height = "7em",
         theme = value_box_theme(bg = kt_colors[2]) #"white"
@@ -639,7 +639,7 @@ server <- function(input, output, session) {
       onclick = "Shiny.setInputValue('select_vol_value', Math.random())",
       value_box(
         title = paste0("Volunteering (",number_years_seleted(), "yr)"),
-        showcase = bs_icon("person-arms-up", size = "1.5rem"),
+        #showcase = bs_icon("person-arms-up", size = "1.5rem"),
         value = custom_number_format(total),
         height = "7em",
         theme = value_box_theme(bg = kt_colors[2]) #"orange"
