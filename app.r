@@ -487,7 +487,7 @@ server <- function(input, output, session) {
     value_box(title = paste0("Total ","social value over ", number_years_seleted(), " years", " from ",selected_years()[1] , " to ",last(selected_years()) ), #make the 
               #value = custom_number_format(df_ten_yr$`Total savings`[df_ten_yr$group == "-"]), #pipe this in from the data
               value = custom_number_format(total),
-              p(paste0(state$parent, 
+              p(paste0(state2$parent, 
                 ": ", 
                 state2$subgroup)),
               showcase = bs_icon("clipboard-data"),
@@ -498,8 +498,7 @@ server <- function(input, output, session) {
   ###############
   ############### clickable cards as selectors
   ###############
-  
-  
+
   output$t2_sidebox1 <- renderUI({
     
     req(state2$subgroup)
@@ -516,7 +515,9 @@ server <- function(input, output, session) {
     ui <- tags$div(
       id = "select_econ_value_box",
       class = "value-box-button",
-      onclick = "Shiny.setInputValue('select_econ_value', Math.random())",
+      #onclick = "Shiny.setInputValue('select_econ_value', Math.random())",
+      onclick = "Shiny.setInputValue('select_econ_value', 'econ', {priority: 'event'})",
+      
       value_box(
         title = paste0("Economic (",number_years_seleted(), "yr)"),
         #showcase = bs_icon("bank", size = "1.5rem"),
@@ -549,7 +550,9 @@ server <- function(input, output, session) {
     ui <- tags$div(
       id = "select_off_value_box",
       class = "value-box-button",
-      onclick = "Shiny.setInputValue('select_off_value', Math.random())",
+      #onclick = "Shiny.setInputValue('select_off_value', Math.random())",
+      onclick = "Shiny.setInputValue('select_off_value', 'off', {priority: 'event'})",
+      
       value_box(
         title = paste0("Re-offending (",number_years_seleted(), "yr)"),
         #showcase = bs_icon("sign-stop", size = "1.5rem"),
@@ -580,7 +583,9 @@ server <- function(input, output, session) {
     ui <- tags$div(
       id = "select_dwp_value_box",
       class = "value-box-button",
-      onclick = "Shiny.setInputValue('select_dwp_value', Math.random())",
+      #onclick = "Shiny.setInputValue('select_dwp_value', Math.random())",
+      onclick = "Shiny.setInputValue('select_dwp_value', 'dwp', {priority: 'event'})",
+      
       value_box(
         title = paste0("DWP/health (",number_years_seleted(), "yr)"),
         #showcase = bs_icon("pencil", size = "1.5rem"),
@@ -612,7 +617,9 @@ server <- function(input, output, session) {
     ui <- tags$div(
       id = "select_well_value_box",
       class = "value-box-button",
-      onclick = "Shiny.setInputValue('select_well_value', Math.random())",
+      #onclick = "Shiny.setInputValue('select_well_value', Math.random())",
+      onclick = "Shiny.setInputValue('select_well_value', 'well', {priority: 'event'})",
+      
       value_box(
         title = paste0("Wellbeing (",number_years_seleted(), "yr)"),
         #showcase = bs_icon("sun", size = "1.5rem"),
@@ -642,7 +649,8 @@ server <- function(input, output, session) {
     ui <- tags$div(
       id = "select_vol_value_box",
       class = "value-box-button",
-      onclick = "Shiny.setInputValue('select_vol_value', Math.random())",
+      #onclick = "Shiny.setInputValue('select_vol_value', Math.random())",
+      onclick = "Shiny.setInputValue('select_vol_value', 'vol', {priority: 'event'})",
       value_box(
         title = paste0("Volunteering (",number_years_seleted(), "yr)"),
         #showcase = bs_icon("person-arms-up", size = "1.5rem"),
@@ -663,7 +671,7 @@ server <- function(input, output, session) {
   })
   
   
-  #  1 Define the mapping (static, non-reactive)
+  # #  1 Define the mapping (static, non-reactive)
   metric_map <- c(
     select_econ_value = colnames(df_ten_yr)[4], #the indexed colnames in case they change
     select_off_value  = colnames(df_ten_yr)[5],
@@ -671,39 +679,147 @@ server <- function(input, output, session) {
     select_well_value = colnames(df_ten_yr)[7],
     select_vol_value  = colnames(df_ten_yr)[9]
   )
-  
+
   # 2 Define the reactive state
   selected_metric <- reactiveVal("Dummy")  # default
   selected_metric_id <- reactiveVal(NULL)
   # 3 Observe all value-box buttons
+
+  # observeEvent(input$select_econ_value, {
+  #   selected_metric(metric_map[["select_econ_value"]])
+  #   selected_metric_id("select_econ_value")
+  # })
   
   observeEvent(input$select_econ_value, {
-    selected_metric(metric_map[["select_econ_value"]])
-    selected_metric_id("select_econ_value")
+    metric_id <- "select_econ_value"
+    metric_col <- metric_map[[metric_id]]
+    
+    if (isTRUE(selected_metric_id() == metric_id)) {
+      # SECOND CLICK → unselect
+      selected_metric(NULL)
+      selected_metric_id(NULL)
+      
+      session$sendCustomMessage("removeSelectedClass", "select_econ_value_box")
+      
+    } else {
+      # FIRST CLICK → select
+      selected_metric(metric_col)
+      selected_metric_id(metric_id)
+      
+      session$sendCustomMessage("addSelectedClass", "select_econ_value_box")
+    }
   })
+  
   
   observeEvent(input$select_off_value, {
-    selected_metric(metric_map[["select_off_value"]])
-    selected_metric_id("select_off_value")
+    metric_id <- "select_off_value"
+    metric_col <- metric_map[[metric_id]]
+    
+    if (isTRUE(selected_metric_id() == metric_id)) {
+      # SECOND CLICK → unselect
+      selected_metric(NULL)
+      selected_metric_id(NULL)
+      
+      session$sendCustomMessage("removeSelectedClass", "select_off_value_box")
+      
+    } else {
+      # FIRST CLICK → select
+      selected_metric(metric_col)
+      selected_metric_id(metric_id)
+      
+      session$sendCustomMessage("addSelectedClass", "select_off_value_box")
+    }
   })
+  
+  
   
   observeEvent(input$select_dwp_value, {
-    selected_metric(metric_map[["select_dwp_value"]])
-    selected_metric_id("select_dwp_value")
+    metric_id <- "select_dwp_value"
+    metric_col <- metric_map[[metric_id]]
+    
+    if (isTRUE(selected_metric_id() == metric_id)) {
+      # SECOND CLICK → unselect
+      selected_metric(NULL)
+      selected_metric_id(NULL)
+      
+      session$sendCustomMessage("removeSelectedClass", "select_dwp_value_box")
+      
+    } else {
+      # FIRST CLICK → select
+      selected_metric(metric_col)
+      selected_metric_id(metric_id)
+      
+      session$sendCustomMessage("addSelectedClass", "select_dwp_value_box")
+    }
   })
+  
+  
   
   observeEvent(input$select_well_value, {
-    selected_metric(metric_map[["select_well_value"]])
-    selected_metric_id("select_well_value")
+    metric_id <- "select_well_value"
+    metric_col <- metric_map[[metric_id]]
+    
+    if (isTRUE(selected_metric_id() == metric_id)) {
+      # SECOND CLICK → unselect
+      selected_metric(NULL)
+      selected_metric_id(NULL)
+      
+      session$sendCustomMessage("removeSelectedClass", "select_well_value_box")
+      
+    } else {
+      # FIRST CLICK → select
+      selected_metric(metric_col)
+      selected_metric_id(metric_id)
+      
+      session$sendCustomMessage("addSelectedClass", "select_well_value_box")
+    }
   })
+  
+  
   
   observeEvent(input$select_vol_value, {
-    selected_metric(metric_map[["select_vol_value"]])
-    selected_metric_id("select_vol_value")
+    metric_id <- "select_vol_value"
+    metric_col <- metric_map[[metric_id]]
+    
+    if (isTRUE(selected_metric_id() == metric_id)) {
+      # SECOND CLICK → unselect
+      selected_metric(NULL)
+      selected_metric_id(NULL)
+      
+      session$sendCustomMessage("removeSelectedClass", "select_vol_value_box")
+      
+    } else {
+      # FIRST CLICK → select
+      selected_metric(metric_col)
+      selected_metric_id(metric_id)
+      
+      session$sendCustomMessage("addSelectedClass", "select_vol_value_box")
+    }
   })
   
+# 
+#   observeEvent(input$select_off_value, {
+#     selected_metric(metric_map[["select_off_value"]])
+#     selected_metric_id("select_off_value")
+#   })
+# 
+#   observeEvent(input$select_dwp_value, {
+#     selected_metric(metric_map[["select_dwp_value"]])
+#     selected_metric_id("select_dwp_value")
+#   })
+# 
+#   observeEvent(input$select_well_value, {
+#     selected_metric(metric_map[["select_well_value"]])
+#     selected_metric_id("select_well_value")
+#   })
+# 
+#   observeEvent(input$select_vol_value, {
+#     selected_metric(metric_map[["select_vol_value"]])
+#     selected_metric_id("select_vol_value")
+#   })
+#   
   
-  # different css for clicked and not clicked sidebar
+    # different css for clicked and not clicked sidebar
   observe({
     # remove selected class from all
     lapply(c(
@@ -715,10 +831,10 @@ server <- function(input, output, session) {
     ), function(id) {
       session$sendCustomMessage("removeSelectedClass", id)
     })
-    
-    # add selected class to the active one 
+
+    # add selected class to the active one
     if (!is.null(selected_metric_id())) {
-      active_id <- paste0(selected_metric_id(), "_box") 
+      active_id <- paste0(selected_metric_id(), "_box")
       session$sendCustomMessage("addSelectedClass", active_id) }
   })
   
@@ -877,6 +993,7 @@ server <- function(input, output, session) {
   ###############
   
   data_highchart_aspect_sub <- reactive({
+    req(selected_metric())
     #set up the df to feed the chart. This will change depending on user inputs
     df %>% 
       filter(group == input$filter4) %>%  # <<<< INTERACTIVE INPUT HERE
@@ -886,6 +1003,7 @@ server <- function(input, output, session) {
   
   #aspect for comparison
   data_highchart_aspect_sub2 <- reactive({
+    req(selected_metric())
     #set up the df to feed the chart. This will change depending on user inputs
     df %>% 
       filter(group == input$filter4b) %>%  # <<<< INTERACTIVE INPUT HERE
@@ -895,6 +1013,7 @@ server <- function(input, output, session) {
   
   #subgroup data
   data_highchart_total_sub <- reactive({
+
     #set up the df to feed the chart. This will change depending on user inputs
     df %>% 
       filter(group == input$filter4) %>%  # <<<< INTERACTIVE INPUT HERE
@@ -904,6 +1023,7 @@ server <- function(input, output, session) {
   
   #comparison group data
   data_highchart_total_sub2 <- reactive({
+
     #set up the df to feed the chart. This will change depending on user inputs
     df %>% 
       filter(group == input$filter4b) %>%  # <<<< INTERACTIVE INPUT HERE
@@ -913,6 +1033,7 @@ server <- function(input, output, session) {
   
   #All (when we have constant series behind the bar)
   data_highchart_aspect_all <- reactive({
+    req(selected_metric())
     #set up the df to feed the chart. This will change depending on user inputs
     df_all %>% 
       select(c(`Cohort years`, group, group_type, `Cohort count`, 
@@ -923,27 +1044,87 @@ server <- function(input, output, session) {
   ############### Tab2 TS chart
   ###############
   
-  output$highchart_plot2 <- 
+  
+  
+  output$highchart_plot2 <- renderHighchart({
     
-    renderHighchart(expr = {
+    # --- base chart (bars only, no metric needed) ---
+    highchart2 <- highchart() %>% 
+      hc_chart(type = "column") %>%
+      hc_title(text = "", align = "left",
+               style = list(fontSize ="24px",
+                            fontFamily = "Arial",
+                            fontWeight = "400")) %>% 
+      hc_exporting(enabled = FALSE) %>% 
+      hc_xAxis(categories = data_highchart_total_sub()$`Cohort years`,
+               title = list(text = "")) %>% 
+      hc_yAxis(labels = list(
+        formatter = JS(" function() { return '£' + Highcharts.numberFormat(this.value / 1e6, 0, '.', ',') + 'M</b>'; } ")
+      )) %>% 
+      hc_plotOptions(
+        column = list(
+          borderRadius = 5,
+          animation = FALSE,
+          grouping = TRUE
+        )
+      ) %>% 
+      hc_tooltip(
+        useHTML = TRUE,
+        formatter = JS(" function() { return '£' + Highcharts.numberFormat(this.y / 1e6, 0, '.', ',') + 'M</b>'; } ")
+      ) %>% 
+      hc_add_theme(kt_theme) %>% 
+      hc_exporting(enabled = TRUE,
+                   buttons = list(
+                     contextButton = list(
+                       menuItems = c("downloadSVG","downloadPNG","downloadXLS")
+                     )))
+    
+    # subgroup bars
+    if (input$filter4 != "all") {
+      highchart2 <- highchart2 %>%
+        hc_add_series(
+          name  = paste0("Total SROI: ", unique(data_highchart_total_sub()$group)),
+          data  = data_highchart_total_sub()$`Total savings`,
+          type  = "column",
+          stack = "Main",
+          color = kt_colors[1],
+          groupPadding = 0.2,
+          maxPointWidth = 120,
+          zIndex = 2
+        )
+    }
+    
+    # comparison bars
+    if (input$filter4b != "-") {
+      highchart2 <- highchart2 %>%
+        hc_add_series(
+          name  = paste0("Total SROI: ", unique(data_highchart_total_sub2()$group)),
+          data  = data_highchart_total_sub2()$`Total savings`,
+          type  = "column",
+          stack = "Comparison",
+          color = kt_colors[2],
+          groupPadding = 0.2,
+          maxPointWidth = 120,
+          zIndex = 2
+        )
+    }
+    
+    # --- only add lines if a metric is selected ---
+    if (!is.null(selected_metric())) {
       
-      # this sets up a object for the data labels
-      # Interactive with the aspect/element of SROI only - always shows the all/total no subgroups
-      #cht_data <- df_all$`Economic value (GVA)`
-      cht_data <- data_highchart_aspect_all() %>% pull(selected_column)
-      
-      # Create a list of points with dataLabels only on the last one, showing series.name
+      # All
+      cht_data  <- data_highchart_aspect_all() %>% pull(selected_column)
       cht_series <- lapply(seq_along(cht_data), function(i) {
         if (i == length(cht_data)) {
           list(
             y = cht_data[i],
             dataLabels = list(
-              enabled = TRUE,
-              align = "left",
-              y = 15,
-              crop = F,
+              enabled  = TRUE,
+              align    = "left",
+              y        = 15,
+              crop     = FALSE,
               overflow = "allow",
-              format = "{series.name}"
+              format   = "{series.name}"
             )
           )
         } else {
@@ -951,23 +1132,19 @@ server <- function(input, output, session) {
         }
       })
       
-      
-      
-      # this sets up a object for the data labels for the second series - USER INTERACTIVE
+      # Subgroup
       cht_data_sub <- data_highchart_aspect_sub() %>% pull(selected_column)
-      
-      # Create a list of points with dataLabels only on the last one, showing series.name
       cht_series_sub <- lapply(seq_along(cht_data_sub), function(i) {
-        if (i == length(cht_data)) {
+        if (i == length(cht_data_sub)) {
           list(
             y = cht_data_sub[i],
             dataLabels = list(
-              enabled = TRUE,
-              align = "right",
-              y = 15,
-              crop = F,
+              enabled  = TRUE,
+              align    = "right",
+              y        = 15,
+              crop     = FALSE,
               overflow = "allow",
-              format = "{series.name}"
+              format   = "{series.name}"
             )
           )
         } else {
@@ -975,23 +1152,20 @@ server <- function(input, output, session) {
         }
       })
       
-      
-      # this sets up a object for the data labels for the comparison series - USER INTERACTIVE
+      # Comparison
       cht_data_sub2 <- data_highchart_aspect_sub2() %>% pull(selected_column)
-      
-      # Create a list of points with dataLabels only on the last one, showing series.name
       cht_series_sub2 <- lapply(seq_along(cht_data_sub2), function(i) {
-        if (i == length(cht_data)) {
+        if (i == length(cht_data_sub2)) {
           list(
             y = cht_data_sub2[i],
             dataLabels = list(
-              enabled = TRUE,
-              align = "right",
-              y = 15,
-              crop = F,
+              enabled  = TRUE,
+              align    = "right",
+              y        = 15,
+              crop     = FALSE,
               overflow = "allow",
-              format = "{series.name}",
-              style = list( fontWeight = "normal") # ← unbold the label
+              format   = "{series.name}",
+              style    = list(fontWeight = "normal")
             )
           )
         } else {
@@ -999,150 +1173,39 @@ server <- function(input, output, session) {
         }
       })
       
-      
-      highchart2 <- highchart() %>% 
-        hc_chart(type = "column"#, 
-                 #spacingRight = 80
-        ) %>%
-        hc_title(text = "", align = "left", 
-                 
-                 style = list(fontSize ="24px",#color = green.pair[1], 
-                              fontFamily = "Arial", fontWeight = "400" )) %>% 
-        hc_exporting(enabled = F) %>% 
-        
-        hc_xAxis(categories = data_highchart_aspect_sub()$`Cohort years`, #substitute this for the selected interactive filter input
-                 title = list(text = "")) %>% 
-        hc_yAxis(#title = list(text = "£"),
-          labels = list(
-            formatter = JS(" function() { return '£' + Highcharts.numberFormat(this.value / 1e6, 0, '.', ',') + 'M</b>'; } ") 
-          )) %>% 
-        hc_plotOptions(
-          column = list(
-            borderRadius = 5,
-            animation = FALSE,
-            grouping = TRUE) ) %>% 
-        hc_tooltip(
-          useHTML = TRUE, 
-          formatter = JS(" function() { return '£' + Highcharts.numberFormat(this.y / 1e6, 0, '.', ',') + 'M</b>'; } ") 
-        ) %>% 
-        hc_add_theme(kt_theme) %>% 
-        hc_exporting(enabled = TRUE,
-                     buttons = list(
-                       contextButton = list(
-                         menuItems = c("downloadSVG","downloadPNG", "downloadXLS"))))
-      
-      
-      
-      
-      # # #bar total (CONSTANT)
-      # hc_add_series(name= "Total SROI",
-      #               data = df_all$`Total savings`,
-      #               type = "column",
-      #               stack = "Main",
-      # 
-      #               # Shared width logic
-      #               pointPadding = 0,
-      #               groupPadding = 0.2,
-      #               maxPointWidth = 120,
-      #               pointPlacement = 0,
-      #               visible = F,
-      #               color = ifelse(input$filter3 == "all" , kt_colors[1], kt_colors[11]), #red
-      #               zIndex = 1) %>%
-      # 
-      # 
-      # 
-      # #line component value
-      #   hc_add_series(data = cht_series, #make this interactive from the side boxes
-      #                 type = "line",
-      #                 name = ifelse(selected_metric() == "Dummy","",  paste0(selected_metric(), ":<br>All ")), #how to get this out of metric_map??
-      #                 marker = list(symbol = 'circle'),
-      #                 pointPlacement = "on",
-      #                 color = kt_colors[5],
-      #                 visible = F,
-      #                 zIndex = 50,
-      #                 dataLabels = list(enabled = F))
-      
-      
-      #condition so that sub groups don't render until a sub group selected
+      # add subgroup line
       if (input$filter4 != "all") {
-        highchart2 <- highchart2 %>% 
-          
-          #bar sub-group
-          hc_add_series(name= paste0("Total SROI: ", unique(data_highchart_total_sub()$group)),
-                        data = data_highchart_total_sub()$`Total savings`, #make this interactive from the side boxes
-                        type = "column",
-                        stack = "Main",
-                        color = kt_colors[1], #lihght red
-                        
-                        # Shared width logic
-                        #pointPadding = 0,
-                        groupPadding = 0.2,
-                        maxPointWidth = 120,
-                        #pointPlacement = 0,
-                        #position = list(offsetY = -25),
-                        
-                        zIndex = 2
-          ) %>%
-          
-          
-          #line component value sub-group
-          hc_add_series(data = cht_series_sub, #make this interactive from the side boxes
-                        type = "line",
-                        name = ifelse(str_detect(selected_metric(),"Dummy"), 
-                                      "",  
-                                      paste0(selected_metric(),":<br>", 
-                                             unique(data_highchart_aspect_sub()$group))), #make this interactive from the side boxes
-                        color = kt_colors[11],
-                        
-                        zIndex = 51,
-                        marker = list(symbol = 'circle'),
-                        dataLabels = list(enabled = F))}
+        highchart2 <- highchart2 %>%
+          hc_add_series(
+            data = cht_series_sub,
+            type = "line",
+            name = paste0(selected_metric(), ":<br>",
+                          unique(data_highchart_aspect_sub()$group)),
+            color  = kt_colors[11],
+            zIndex = 51,
+            marker = list(symbol = "circle"),
+            dataLabels = list(enabled = FALSE)
+          )
+      }
       
-      
-      
-      highchart2
-      
-      #condition so that comparison don't render until selected
+      # add comparison line
       if (input$filter4b != "-") {
-        highchart2 <- highchart2 %>% 
-          
-          #bar sub-group
-          hc_add_series(name= paste0("Total SROI: ", unique(data_highchart_total_sub2()$group)),
-                        data = data_highchart_total_sub2()$`Total savings`, #make this interactive from the side boxes
-                        type = "column",
-                        stack = "Comparison",
-                        color = kt_colors[2], #lihght red
-                        
-                        # Shared width logic
-                        #pointPadding = 0,
-                        groupPadding = 0.2,
-                        maxPointWidth = 120,
-                        # pointPlacement = 0,
-                        #position = list(offsetY = -25),
-                        
-                        zIndex = 2
-          ) %>%
-          
-          
-          #line component value sub-group
-          hc_add_series(data = cht_series_sub2, #make this interactive from the side boxes
-                        type = "line",
-                        name = ifelse(str_detect(selected_metric(),"Dummy"), 
-                                      "",  
-                                      paste0(selected_metric(),":<br>", unique(data_highchart_aspect_sub2()$group))), #make this interactive from the side boxes
-                        color = kt_colors[7],
-                        
-                        zIndex = 51,
-                        marker = list(symbol = 'circle'),
-                        dataLabels = list(enabled = F))}
-      
-      
-      
-      highchart2
-      
-    } 
-    )
-  
+        highchart2 <- highchart2 %>%
+          hc_add_series(
+            data = cht_series_sub2,
+            type = "line",
+            name = paste0(selected_metric(), ":<br>",
+                          unique(data_highchart_aspect_sub2()$group)),
+            color  = kt_colors[7],
+            zIndex = 51,
+            marker = list(symbol = "circle"),
+            dataLabels = list(enabled = FALSE)
+          )
+      }
+    }
+    
+    highchart2
+  })
   
 }
 
