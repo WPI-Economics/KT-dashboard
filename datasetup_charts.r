@@ -90,7 +90,16 @@ df <- read_csv("db_data.csv") %>%
                                "2021/22", 
                                "2022/23", 
                                "2023/24", 
-                               "2024/25")) %>% filter(!is.na(group)) %>% unique()
+                               "2024/25")) %>% filter(!is.na(group)) %>% unique() %>% 
+  
+  #remove proposision and programme prefix from the value names
+  mutate(
+  "group" = case_when(
+    str_detect(group, ":") ~
+    word(group, 2, sep = ": "),
+    TRUE ~ group))
+  
+  
   #0dp rounding
 numeric_cols <- colnames(df[sapply(df, is.numeric)]) #identify numeric columns
 df[numeric_cols] <- sapply(df[numeric_cols], function(x){round(x,0)})
