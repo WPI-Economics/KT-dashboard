@@ -202,7 +202,7 @@ ui <-
                 #red total box
                 div(
                   class = "sv-summary-row", 
-                  uiOutput("t1_totalbox2")
+                  uiOutput("t2_totalbox")
                 ),
                 
                 # #time filter
@@ -370,7 +370,7 @@ server <- function(input, output, session) {
                                  year_lookup$year_index <= idx_max]
   })
   
-  
+  #dynamic count of years selected for text boxes
   number_years_seleted <- reactive({length(selected_years())})
   
 
@@ -466,6 +466,9 @@ server <- function(input, output, session) {
     value_box(title = "10 year social value",
               #value = custom_number_format(df_ten_yr$`Total savings`[df_ten_yr$group == "-"]), #pipe this in from the data
               value = custom_number_format(total),
+              p(paste0(state$parent, 
+                       ": ", 
+                state$subgroup)),
               showcase = bs_icon("clipboard-data"),
               theme = value_box_theme(bg = kt_colors[1]), 
               
@@ -473,7 +476,7 @@ server <- function(input, output, session) {
   })
   
   #selected subgroup value to use in data filter tab2 version
-  output$t1_totalbox2 <- renderUI({
+  output$t2_totalbox <- renderUI({
     
     # data logic
     selected <- state2$subgroup
@@ -484,6 +487,9 @@ server <- function(input, output, session) {
     value_box(title = paste0("Total ","social value over ", number_years_seleted(), " years", " from ",selected_years()[1] , " to ",last(selected_years()) ), #make the 
               #value = custom_number_format(df_ten_yr$`Total savings`[df_ten_yr$group == "-"]), #pipe this in from the data
               value = custom_number_format(total),
+              p(paste0(state$parent, 
+                ": ", 
+                state2$subgroup)),
               showcase = bs_icon("clipboard-data"),
               theme = value_box_theme(bg = kt_colors[1]),
               fill = TRUE)
