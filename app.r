@@ -43,7 +43,12 @@ ui <-
             id = "main-header",
             img(src = "logo_left2.svg", id = "main-logo", class = "header-logo"),
             tags$h1("SOCIAL VALUE DASHBOARD 2026", id = "main-title"),
+            
+            a(
+              href = "https://wpieconomics.com/",
+              target = "_blank",
             img(src = "logo_right.svg", id = "main-logo", class = "header-logo")
+            )
         ),
         
         tags$script(HTML("
