@@ -7,10 +7,19 @@ library(bsicons)
 library(sass)
 library(downloadthis)
 library(shinyWidgets)
+library(shinymanager)
+
+
+#password protection
+credentials <- data.frame(
+  user = c("gweir", "admin"),
+  password = c("secondbiggestwolfintheforest", "biggestwolfintheforest"),
+  admin = c(TRUE, TRUE),
+  stringsAsFactors = FALSE
+)
 
 
 #read in data, colours and highchart chart
-
 source("datasetup_charts.r")
 
 my_theme <- bs_theme(version = 5,
@@ -30,7 +39,7 @@ my_theme <- bs_theme(version = 5,
 ########################################################################
 ########################################################################
 
-ui <- 
+ui_raw <- 
   
   page_fillable(
     
@@ -270,6 +279,16 @@ ui <-
         ))
   )
 
+#SECURITY FROM SHINYMANAGER
+ui <- secure_app(ui_raw,
+                 theme = bs_theme(version = 5,
+                                  fg = kt_colors[5],
+                                  bg = kt_colors[6],
+                                  bootswatch = "flatly",
+                                  primary = kt_colors[1],
+                                  secondary = "#FFFFFF",
+                                  base_font = "Helvetica")
+                 )
 
 ################################################################################################################################################
 ################################################################################################################################################
@@ -279,6 +298,9 @@ ui <-
 
 server <- function(input, output, session) {
   
+  #SECURITY FROM SHINYMANAGER
+  res_auth <- secure_server( check_credentials = check_credentials(credentials) )
+  output$out <- renderText(input$txt)
   
   #################
   ################# filter stuff tab1
