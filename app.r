@@ -1088,7 +1088,7 @@ server <- function(input, output, session) {
     if (input$filter4 != "all") {
       highchart2 <- highchart2 %>%
         hc_add_series(
-          name  = paste0("Total SROI: ", unique(data_highchart_total_sub()$group)),
+          name  = paste0("Total value: ", unique(data_highchart_total_sub()$group)),
           data  = data_highchart_total_sub()$`Total savings`,
           type  = "column",
           stack = "Main",
@@ -1103,7 +1103,7 @@ server <- function(input, output, session) {
     if (input$filter4b != "-") {
       highchart2 <- highchart2 %>%
         hc_add_series(
-          name  = paste0("Total SROI: ", unique(data_highchart_total_sub2()$group)),
+          name  = paste0("Total value: ", unique(data_highchart_total_sub2()$group)),
           data  = data_highchart_total_sub2()$`Total savings`,
           type  = "column",
           stack = "Comparison",
