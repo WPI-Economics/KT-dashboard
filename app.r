@@ -686,7 +686,7 @@ server <- function(input, output, session) {
   )
 
   # 2 Define the reactive state
-  selected_metric <- reactiveVal("Dummy")  # default
+  selected_metric <- reactiveVal(NULL)  # default
   selected_metric_id <- reactiveVal(NULL)
   # 3 Observe all value-box buttons
 
@@ -1085,7 +1085,7 @@ server <- function(input, output, session) {
                      )))
     
     # subgroup bars
-    if (input$filter4 != "all") {
+    if (input$filter4 != "All") {
       highchart2 <- highchart2 %>%
         hc_add_series(
           name  = paste0("Total value: ", unique(data_highchart_total_sub()$group)),
@@ -1179,7 +1179,7 @@ server <- function(input, output, session) {
       })
       
       # add subgroup line
-      if (input$filter4 != "all") {
+      if (input$filter4 != "All") {
         highchart2 <- highchart2 %>%
           hc_add_series(
             data = cht_series_sub,
