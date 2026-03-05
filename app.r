@@ -41,7 +41,9 @@ ui <-
         
         div(class = "container-md",
             id = "main-header",
-            img(src = "logo_left2.svg", id = "main-logo", class = "header-logo"),
+            img(src = "logo_left2.svg", id = "main-logo", class = "header-logo-gap"),
+            
+            img(src = "TKMAXX_PERM_LOGO_WHT.svg", id = "main-logo", class = "header-logo"),
             tags$h1("SOCIAL VALUE DASHBOARD 2026", id = "main-title"),
             
             a(
