@@ -41,11 +41,43 @@ h1 {
   margin: 0; } 
   
   
-.header-logo { 
+.header-logo-kt { 
  height: 70px; 
  width: auto; 
  display: block;
 }
+
+.header-logo-wpi { 
+ height: 50px; 
+ width: auto; 
+ display: block;
+ margin-top: 15px;
+ margin-right: 5px;
+}
+
+.header-logo-tk { 
+ height: 55px; 
+ width: auto; 
+ display: block;
+ 
+}
+
+.logo-wrapper {
+  display: flex;
+  flex-direction: column;
+  align-items: center; /* or flex-start if you want left-aligned */
+}
+
+.logo-support-text {
+  font-size: 8px;      /* very small */
+  color: white;         /* match your header theme */
+  margin-bottom: 1px;   /* tighten spacing above the logo */
+  letter-spacing: 0.5px;
+  text-transform: uppercase;
+  margin-left: 3px;
+  
+}
+
 
 
 #intro_box {
